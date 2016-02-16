@@ -1,0 +1,78 @@
+###################################################
+Read me - Poverty Thread
+08/31/2015
+###################################################
+Important notes: 
+
+1.	The subset of households for the SAGCOT area from the Tanzania LSMS 2013 
+      data has been selected based on the main regions falling within the 
+	  SAGCOT boundaries. We are currently working on improving the selection 
+	  process by selecting only households that have enumeration areas falling 
+	  within the SAGCOT boundaries. 
+2.  National level estimates for Ghana are estimated from published record, and are
+      thus excluded from analysis.
+
+###################################################
+  1. Tanzania: LSMS 2013 at the SAGCOT level
+###################################################
+
+The poverty indicators are generated for the SAGCOT area using the LSMS 2013 data (wave 3), 
+   and the following reference data:
+   
+   poverty line - the poverty line set from the Tanzania National Panel wave 2 final 
+     report
+   food index - the Fisher food price index used for inflating the national poverty
+     line from the wave 2 survey to the timing of the wave 3 survey from the Tanzania
+	 National Panel wave 3 final report
+   CPI - the yearly CPI as reported through the World Bank, used for inflating currency
+     values to base years
+   Adult equivalency scale - the adult equivalent function used for estimating the 
+     consumptive needs of an individual based on their age and sex
+ 
+Poverty.TZA.R: script that takes the TZA LSMS 2013 data and reference data as input, 
+   and calculates the set of poverty indicators as a csv file 
+   with the main indicators from the thread:
+•	P2 Headcount Ratio
+•	P3 Poverty gap
+•	P6 Per capita consumption
+
+Poverty.TZA.R references a set of functions from the following R files:
+Poverty.R - contains a set of functions for determining indicators from valued consumption.
+
+###################################################
+  2. Vital Signs at landscape level (Tier 4)
+###################################################
+
+The poverty indicators are generated for the SAGCOT area using the LSMS 2013 data (wave 3), 
+   and the following reference data:
+   
+   poverty line - the poverty line set from the Tanzania National Panel wave 2 final 
+     report
+   poverty line - the poverty line set from the Ghana Living Standards Survey "Poverty
+      Profiles in Ghana 2005-2015" reported through the Ghanaian Statistical Service
+   food index - the Fisher food price index used for inflating the national poverty
+     line from the wave 2 survey to the timing of the wave 3 survey from the Tanzania
+	 National Panel wave 3 final report
+   CPI - the yearly CPI as reported through the World Bank, used for inflating currency
+     values to base years
+   Adult equivalency scale - the adult equivalent function used for estimating the 
+     consumptive needs of an individual based on their age and sex
+ 
+Poverty.TZA.R: script that takes the TZA LSMS 2013 data and reference data as input, 
+   and calculates the set of poverty indicators as a csv file 
+   with the main indicators from the thread:
+•	P2 Headcount Ratio
+•	P3 Poverty gap
+•	P6 Per capita consumption
+
+Poverty.TZA.R references a set of functions from the following R files:
+Poverty.R - contains a set of functions for determining indicators from valued consumption.
+VS.R - contains a set of common data staging functions for use with the VS household 
+   and agriculture surveys   
+
+###################################################
+  3. Ghana: GLSS 5 at the national level
+###################################################
+
+The national level indicators are in the public record, as published through the Ghana's
+   National Statistical Service in the "Poverty Profiles in Ghana 2005-2015" Report.

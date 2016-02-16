@@ -1,0 +1,63 @@
+###################################################
+Read me - Food Security
+08/31/2015
+###################################################
+Important notes: 
+
+1.	The subset of households for the SAGCOT area from the Tanzania LSMS 2013 
+      data has been selected based on the main regions falling within the 
+	  SAGCOT boundaries. We are currently working on improving the selection 
+	  process by selecting only households that have enumeration areas falling 
+	  within the SAGCOT boundaries. 
+
+###################################################
+  1. Tanzania: LSMS 2013 at the SAGCOT level
+###################################################
+
+The Food security indicators are generated for the SAGCOT area using the LSMS 2013 data (wave 3), 
+   and the following reference data:
+   
+   CroptozaocodeconversionTZLSMS2013 - crop code conversion to standard food item codes
+   TZLSMS_Nutrientlookuptables_2015_08_06 - the list of food items from the survey and their respective
+	 nutrient components 
+   ​FoodSecurity_ExternalDataTables.xlsx​ - the set of external data tables, including:
+	 DRI - the daily recommended nutrient intake for individuals
+	 livestock - the livestock conversion to available food consumption (weight per animal)
+ 
+FoodSecurity.TZA.R: script that takes the TZA LSMS 2013 data and reference data as input, 
+   and calculates the set of poverty indicators as a csv file 
+   with the main indicators from the thread:
+•	
+•	FS 19 food access score
+•	FS 22 food utilization
+
+###################################################
+  2. Vital Signs at landscape level (Tier 4)
+###################################################
+
+
+The Food security indicators are generated for the SAGCOT area using the VS household and agriculture data, 
+   and the following reference data:
+   
+   CroptozaocodeconversionTZLSMS2013 - crop code conversion to standard food item codes
+   TZLSMS_Nutrientlookuptables_2015_08_06 - the list of food items from the survey and their respective
+	 nutrient components 
+   ​FoodSecurity_ExternalDataTables.xlsx​ - the set of external data tables, including:
+	 DRI - the daily recommended nutrient intake for individuals
+	 livestock - the livestock conversion to available food consumption (weight per animal)
+ 
+FoodSecurity.VS.R: script that takes the VS household and agriculture data and reference data as input, 
+   and calculates the set of poverty indicators as a csv file 
+   with the main indicators from the thread:
+•	
+•	FS 19 food access score
+•	FS 22 food utilization
+
+FoodSecurity.VS.R references a set of functions from the following R files:
+VS.R - contains a set of common data staging functions for use with the VS household 
+   and agriculture surveys   
+
+###################################################
+  3. Ghana: GLSS 5 at the national level
+###################################################
+

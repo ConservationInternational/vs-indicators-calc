@@ -1,0 +1,133 @@
+#########################
+# Ag Intensification join file
+# Area: TZA, SAGCOT
+# August 20, 2015
+#########################
+# data sources
+data_dir1 <- "C:/Users/Administrator/Dropbox/'EI- Vital Signs/R coding of Threads/Ag Intensification/New code"
+
+# data outputs
+out_dir1 <- "C:/Data/Vital Signs/Ag Intensification/Outputs"
+
+#########################
+
+# 1. Run Ag.FieldData.R, Ag.PotentialYield.R, and Ag.CultivatedArea.R files: 
+
+# AI10, AI12, AI13, AI16 (AI14, AI15, AI17)
+# df1=field_data contains  (unique on hhid and field)
+#       maize yield in kg/ha
+#       n usage in kg/ha 
+#       p usage in kg/ha
+#       indicator for irrigation (1 = yes, 0 = no)
+# AI7(AI8) - number of crops per year
+# df2=num_crops contains  (unique on hhid and field)
+#       number of times maize was grown
+# AI35 - % cultivated allocated to crop (here: maize)
+# df3= pct_maize is the % area devoted to maize (unique to household)
+# source: LSMS (Vital signs surveys)
+setwd(data_dir1)
+run1<-parse("Ag.FieldData.TZA.LSMS.R")
+eval(run1)
+  # only keep relevant datasets: 
+  field_data <- FieldData.TZA.LSMS
+  num_crops <- NumCrops.TZA.LSMS
+  pct_maize <- PctMaize.TZA.LSMS
+  rm(FieldData.TZA.LSMS, NumCrops.TZA.LSMS, PctMaize.TZA.LSMS)
+    
+# AI11 - yp.sagcot is yield potential in kg/ha 
+# source: IISA Total production capacity geotiff
+setwd(data_dir1)
+run2 <- parse("Ag.PotentialYield.TZA.R") 
+eval(run2)
+  AI11 <- yp.sagcot
+  AI11.med <- yp.sagcot.med
+  AI11.sd <- yp.sagcot.sd
+
+# AI20 - cultivated_area in ha
+# source: Globcover 2009 geotiff
+setwd(data_dir1)
+run3 <- parse("Ag.CultivatedArea.GlobCover.TZA.R") 
+eval(run3)
+
+  cult.area <- cult.area.sagcot
+  area <- area.sagcot
+
+# 2. Calculate the indicators: 
+  
+# AI39 - output intensity is maize yield times # of crops per year
+#       merge df1=field_data and df2=num_crops
+#       output_intensity <- df1$yield * df2$num_crops
+field_data <- merge(field_data, num_crops, by.x ="y3hhid_plotnum", by.y="Var1")
+output_intensity <- field_data$cropyieldkgperha * field_data$Freq
+
+AI39 <- mean(output_intensity)
+AI39.med <- median(output_intensity)
+AI39.sd <- sd(output_intensity)
+
+# AI17(AI18) # of crops per year
+AI17 <- mean(field_data$Freq)
+
+# AI42 - extent for maize is pct_maize times cultivated area for maize
+#       extent_maize <- pct_maize (AI35) * cultivated_area
+AI35 <- mean(pct_maize$maizeareapercent, na.rm=TRUE)  
+AI42 <- AI35 * cult.area 
+
+# AI47 - integrated output intensity is output intensity times extent for maize
+#       integrated_output <- mean(output_intensity) (AI39) * extent_maize (AI42)
+AI47 <- AI39 * AI42
+
+# AI40 - attainable yield is potential yield times 0.8
+#       attainable <- yp.sagcot (AI11) *0.8
+AI40 <- 0.8 * AI11
+
+# AI48 - yield gap is difference between attainable yield and avg realized yield
+#       yield_gap <- attainable (AI40) - realized yields (AI38)
+AI38 <- mean(field_data$cropyieldkgperha, na.rm=TRUE)
+AI38.med <- median(field_data$cropyieldkgperha, na.rm=TRUE)
+AI38.sd <- sd(field_data$cropyieldkgperha, na.rm=TRUE)
+AI48 <- AI40 - AI38
+
+# AI34 
+# Input needed for optimal yield is inputs / optimal input amount
+#       df1$n <- df1$n / 100
+#       df1$p <- df1$p / 30
+field_data$n <- field_data$TotNaddedkghaInorg / 100
+field_data$p <- field_data$TotPaddedkghaInorg / 30
+
+# Intensity per factor is factor times # of cropping seasons
+# merge df1 and df2 by hhid, field id # already done above
+#       df3 <- merge(df1, df2) # already done above
+#       df3$n <- df3$n * df3$num_crops
+#       df3$p <- df3$p * df3$num_crops
+field_data$n_int <- field_data$n * field_data$Freq
+field_data$p_int <- field_data$p * field_data$Freq
+AI34_N <- mean(field_data$n_int, na.rm=TRUE)
+AI34_P <- mean(field_data$p_int, na.rm=TRUE)
+
+# AI41 - Combined input intensity per crop or land use
+#       combined impact intensity is the weighted sum of average intensity factors
+#       AI41 <- intensity_mean$n * 0.2 +  intensity_mean$p * 0.1 + intensity_mean$irr * 0.1 + 0.6 
+AI41 <- mean(field_data$n_int, na.rm=TRUE)* .2 + mean(field_data$p_int, na.rm=TRUE)*0.1 + 0.6
+
+# AI49 - Agriculture input intensity (impact/ha/yr/crop or land use)
+AI49 <- (AI41 * AI42) / cult.area
+
+# AI50 - Landscape imput impact intensity
+AI50 <- (AI41 * AI42) / area
+
+# set output directory: 
+setwd(out_dir1)
+
+# write output: 
+country <- "TZA"
+scale <- "Sagcot"
+year <- "2013"
+landscape <- NA
+output <- data.frame(country, scale, year, landscape, AI41, AI47, AI48, AI49, AI50)
+output$AI41 <- round(output$AI41, 3)
+output$AI47 <- round(output$AI47, 0)
+output$AI48 <- round(output$AI48, 0)
+output$AI49 <- round(output$AI49, 3)
+output$AI50 <- round(output$AI50, 3)
+
+write.csv(output, file = "Ag.Intensification.TZA.LSMS.Sagcot.2013.csv")
