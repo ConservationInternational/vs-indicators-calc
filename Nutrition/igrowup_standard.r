@@ -402,7 +402,7 @@ return(mat)
 ##### Function for calculating the z-scores for all indicators
 #############################################################################
 
-igrowup.standard <- function(FileLab="Temp",FilePath="C:\\Documents and Settings",mydf,sex,age,age.month=F,weight=rep(NA,dim(mydf)[1]),lenhei=rep(NA,dim(mydf)[1]),measure=rep(NA,dim(mydf)[1]),
+igrowup.standard <- function(mydf,sex,age,age.month=F,weight=rep(NA,dim(mydf)[1]),lenhei=rep(NA,dim(mydf)[1]),measure=rep(NA,dim(mydf)[1]),
            headc=rep(NA,dim(mydf)[1]),armc=rep(NA,dim(mydf)[1]),triskin=rep(NA,dim(mydf)[1]),subskin=rep(NA,dim(mydf)[1]),oedema=rep("n",dim(mydf)[1]),sw=rep(1,dim(mydf)[1])) {
 	
 #############################################################################
@@ -531,12 +531,6 @@ mat<-cbind.data.frame(mydf,mat[,-c(1,3:6,8:9)])
 ###################################################################################################
 
 assign("matz",mat,envir = .GlobalEnv)
-
-write.table(matz, file=paste(FilePath,"/",FileLab,"_z_st.csv",sep=""),na="",row.names = FALSE,sep=",",quote = TRUE)
-
-
-cat(paste("Z-scores calculated and exported to ",FilePath,"/",FileLab,"_z_st.csv\n\n",sep="")) 
-
 
 #######################################################################################################
 #### Calculating prevalences and summary statistics. 
@@ -929,10 +923,6 @@ mat3<-rbind.data.frame(mat1,mat3)
 ###################################################################################################################
 
 assign("matprev",mat3,envir = .GlobalEnv)
-
-write.table(matprev, file=paste(FilePath,"/",FileLab,"_prev_st.csv",sep=""),na=" ",row.names = FALSE,col.names=F,sep=",",quote = TRUE)
-
-cat(paste("Prevalences and z-score summary statistics calculated and exported to ",FilePath,"/",FileLab,"_prev_st.csv\n",sep="")) 
 
 on.exit(options(old))
 
