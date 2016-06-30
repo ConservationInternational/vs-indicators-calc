@@ -1,81 +1,24 @@
-###################################################
-Read me - Nutrition thread
-08/31/2015
-###################################################
-Important notes: 
+#Nutrition thread
+######06/30/2016
 
-1.	The subset of households for the SAGCOT area from the Tanzania LSMS 2013 
-      data has been selected based on the main regions falling within the 
-	  SAGCOT boundaries. We are currently working on improving the selection 
-	  process by selecting only households that have enumeration areas falling 
-	  within the SAGCOT boundaries. 
-2.  National level estimates for Ghana cannot be estimated from the GLSS national 
-      data, due to anonymization
 
-###################################################
-  1. Tanzania: LSMS 2013 at the SAGCOT level
-###################################################
+The script Nutrition.VS.Individual.R calculates seven different sub-indicators of nutrition:
+ * Overweight
+ * Underweight
+ * Severe Underweight
+ * Stunting
+ * Severe Stunting 
+ * Wasting
+ * Severe Wasting
+It also calculates the indicator of Composite Index of Anthropometric
+Failure (CIAF), (Nandy and Svedberg 2012).  CIAF essentially indicates if a child has 
+stunting OR wasting OR underweight.
 
-The Nutrition indicators are generated for the SAGCOT area using the LSMS 2013 data, 
-   and the WHO child growth standards to obtain nutritional indicators.
- 
-Nutrition.TZA.R: script that takes the TZA LSMS 2013 data and WHO child growth 
-   standards as input, and calculates the set of nutrition indicators as a csv file 
-   with the main indicators from the thread:
-•	N3 Overvweight
-•	N4 Underweight
-•	N5 Stunting
-•	N6 Wasting
+The indicator and subindicators were calculated at the individual level for all children
+5 years old or younger in the VS database.  It should be easy to aggregate at the national
+or Landscape level.
 
-Nutrition.TZA.R references a set of functions from the following R files:
-igrowup_standard.R - contains functions that calculate the prevalence and incidence 
-   of anthro scores, provided by the World Health Organization (WHO).
-Nutrition.R - contains a set of functions for determining indicators from prevalence
-   and incidence rates.
+The latitude and longitude in the output table are at the VS Landscape level.
 
-###################################################
-  2. Vital Signs at landscape level (Tier 4)
-###################################################
 
-The Nutrition indicators are generated for each VS landscape using the VS Household 
-   survey data, and the WHO child growth standards to obtain nutritional indicators.
- 
-Nutrition.VS.R: script that takes the VS Household survey data and WHO child growth 
-   standards as input, and calculates the set of nutrition indicators as a csv file 
-   with the main indicators from the thread:
-•	N3 Overvweight
-•	N4 Underweight
-•	N5 Stunting
-•	N6 Wasting
 
-Nutrition.TZA.R references a set of functions from the following R files:
-igrowup_standard.R - contains functions that calculate the prevalence and incidence 
-   of anthro scores, provided by the World Health Organization (WHO).
-Nutrition.R - contains a set of functions for determining indicators from prevalence
-   and incidence rates.
-VS.R - contains a set of common data staging functions for use with the VS household 
-   and agriculture surveys   
-
-###################################################
-  3. Ghana: GLSS 5 at the national level
-###################################################
-
-The Nutrition indicators are generated for Ghana using the same process as the 
-   Tanzania national level analysis. The difference is the national data source
-   (Ghana Living Standards Survey, 5th wave GLSS 5) and the subsequent staging. Note that
-   the publically available data will not contain the necessary columns (height, weight)
-   to calculate the nutrition indicators for Ghana.
-   
-Nutrition.GHA.R: script that takes the GLSS 5 data and WHO child growth 
-   standards as input, and calculates the set of nutrition indicators as a csv file 
-   with the main indicators from the thread:
-•	N3 Overvweight
-•	N4 Underweight
-•	N5 Stunting
-•	N6 Wasting
-
-Nutrition.GHA.R references a set of functions from the following R files:
-igrowup_standard.R - contains functions that calculate the prevalence and incidence 
-   of anthro scores, provided by the World Health Organization (WHO).
-Nutrition.R - contains a set of functions for determining indicators from prevalence
-   and incidence rates.
