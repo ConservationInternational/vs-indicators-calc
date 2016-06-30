@@ -10,6 +10,7 @@ The script Nutrition.VS.Individual.R calculates seven different sub-indicators o
  * Severe Stunting 
  * Wasting
  * Severe Wasting
+
 It also calculates the indicator of Composite Index of Anthropometric
 Failure (CIAF), (Nandy and Svedberg 2012).  CIAF essentially indicates if a child has 
 stunting OR wasting OR underweight.
