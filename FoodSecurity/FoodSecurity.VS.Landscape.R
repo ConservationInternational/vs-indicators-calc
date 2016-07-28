@@ -25,13 +25,21 @@ library(lubridate)
 
 # Vital Signs Datasets
 metadata <- read.csv("hh_secA.csv")
-food_spending <- read.csv("hh_secK1.csv")
-food_consumption <- read.csv("hh_secK2.csv")
-nonfood_spending <- read.csv("hh_secL.csv")
+food_spending <- read.csv("hh_secK1.csv") #FS 6
+food_consumption <- read.csv("hh_secK2.csv") #FS 9
+nonfood_spending <- read.csv("hh_secL.csv") #FS 7
+
+food_insecurity <- read.csv("hh_secI.csv") #FS 5
+crop_production <- read.csv("agric_sec4_crops_by_field.csv") #FS 1
+fruit_prodcution <- read.csv("agric_sec6_permanent_crops_by_field.csv") #FS 1
+livestock <- read.csv("agric_sec10a_livestock.csv") #FS 2
+by_prouducts <- read.csv("agric_sec10b_livestock.csv") #FS 2
+
+
+
 
 # External Datasets
 staple <- read.csv("staple.csv")
-
 
 #################
 # Define Functions
@@ -70,16 +78,11 @@ nonfoodcons <- function (df, sec_m = TRUE) {
   df[df$nonfood.code %in% weekly,'amount.spent'] <- df[df$nonfood.code %in% weekly,'amount.spent']/7*365.24
   df[!df$nonfood.code %in% weekly,'amount.spent'] <- df[!df$nonfood.code %in% weekly,'amount.spent']/31*365.24
   
-  
   # sum valued nonfood consumption by household
   nonfood <- ddply(df, 
                    .(Household.ID), 
                    summarise, 
                    nonfood_cons = sum(amount.spent, na.rm = TRUE))
-  
-  
-  #THERE IS AN ERROR HERE HE DOESNT ANNUALIZE CORRECTLY
-  # annualize nonfood consumption
   
   return(nonfood)
   
@@ -100,6 +103,7 @@ food_consumption <- ddply(food_consumption, .(Country, Household.ID, Landscape..
                           k2_8_i=mean(k2_8_i, na.rm=T), k2_8_j=mean(k2_8_j, na.rm=T), k2_9=mean(k2_9, na.rm=T), k2_10_a=mean(k2_10_a, na.rm=T), k2_11_a=mean(k2_11_a, na.rm=T),
                           k2_10_b=mean(k2_10_b, na.rm=T), k2_11_b=mean(k2_11_b, na.rm=T), k2_10_c=mean(k2_10_c, na.rm=T), k2_11_c=mean(k2_11_c, na.rm=T), k2_10_d=mean(k2_10_d, na.rm=T), k2_11_d=mean(k2_11_d, na.rm=T))
 
+#FS 7
 food.cons <- foodcons(food_spending)
 
 nonfood.cons <- nonfoodcons(nonfood_spending)
@@ -121,6 +125,9 @@ foodsec <- merge(nonfood.cons, food.cons, all = TRUE)
 foodsec <- merge(foodsec, nonstaple.cons, all = TRUE)
 foodsec <- merge(foodsec, metadata, all = TRUE)
 
+#FS 8 Per capita food consumption in mass is missing, too
+
+#FS 9
 food_util <- merge(food_consumption, metadata, all = TRUE)
 
 foodsec$key <- paste0(foodsec$Country, '.', foodsec$Landscape..)
@@ -142,6 +149,7 @@ for (k in unique(foodsec$key)){
   # get average year of survey enumeration
   yr <- year(mean(foodsec_ls$Data.entry.date))
   
+  # FS 16 missing - so 'proxy' gap assessment done instead
   # FS 17 proxy gap assessment
   gap <- mean(foodsec_ls$staple_cons / foodsec_ls$food_cons, na.rm=T)
   
@@ -151,6 +159,8 @@ for (k in unique(foodsec$key)){
   
   # FS 19 food access score
   access <- gap * buffer
+  
+  # Missing FS 20, which should be combined with FS 21
 
   # FS21.1 daily dietary diversity score
   # sum p(consumed food item yesterday) as x / 7 for all x
@@ -165,9 +175,9 @@ for (k in unique(foodsec$key)){
   # FS22 calc food utilization
   utilization <- mean(daily * 0.5 + weekly * 0.5, na.rm=T)
     
-#################
-# Format Output
-#################
+  #################
+  # Format Output
+  #################
   
   foodsec.df1 <- data.frame(country = ctr,
                                scale = "Landscape",
