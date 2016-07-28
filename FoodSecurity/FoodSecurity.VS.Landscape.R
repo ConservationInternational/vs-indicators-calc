@@ -1,7 +1,7 @@
 #############################
 # Workflow - Food Security
-# scale - Landscape
-# 14 August 2015 - ongoing
+# Scale - Landscape
+# 09 May 2016
 #
 # input the following modules from the VS Household Survey
 #
@@ -15,57 +15,86 @@
 # Setup
 #################
 
-# Package needed to import STATA files
-library(VitalSignsUtilities)
 library(reshape2)
 library(plyr)
-
-# Create instance of vital signs tables collector
-arguments <- commandArgs(trailingOnly = FALSE)
-service_credentials <- gsub("[^=]+={1}", "",
-                            arguments[grep("credentials", arguments)])
-#credentials_file <- "~/Downloads/Vital Signs Data-bc27b8bfb478.json"
-
-# Create instance of vital signs tables collector
-vstables <- vital_signs_tables(creds_file = credentials_file, service = T, cache = T)
-
-# Load the github repo object
-ci.repo <- checkGithubToken()
-
-# Query for all vital signs datasets in Google Drive
-vstables$getExternalData()
-vstables$getInternalData()
-
-# source functions
-ci.repo$sourceRCode("Nutrition/VS.R")
-
-# set name for output file
-outfile <- "VS_Landscape"
 
 #################
 # Loading
 #################
 
-# Date of interview
-hh_sec_a <- readVS(file = vstables$tables[["hh_secA.csv"]]$getData(), survey = "HH", section = "A")
-hh_sec_k1 <- readVS(file = vstables$tables[["hh_secK1.csv"]]$getData(), survey = "HH", section = "K1")
-hh_sec_k2 <- readVS(file = vstables$tables[["hh_secK2.csv"]]$getData(), survey = "HH", section = "K2")
-hh_sec_l <- readVS(file = vstables$tables[["hh_secL.csv"]]$getData(), survey = "HH", section = "L")
+# Vital Signs Datasets
+hh_sec_a <- read.csv("hh_secA.csv")
+hh_sec_k1 <- read.csv("hh_secK1.csv")
+hh_sec_k2 <- read.csv("hh_secK2.csv")
+hh_sec_l <- read.csv("hh_secL.csv")
 
-# Staple foods
-staple <- read.csv(vstables$tables[["staple.csv"]]$getData(), stringsAsFactors = F)
+# External Datasets
+staple <- read.csv("staple.csv")
+
+
+#################
+# Define Functions
+#################
+
+foodcons <- function(df) {
+  
+  df$k_04[is.na(df$k_04) ] <- 0  #NA counts as 0 spending
+  df$k_05a[is.na(df$k_05a) ] <- 0  #NA counts as 0 hypothetical spending
+  
+  food <- ddply(df, 
+                .(Household.ID), 
+                summarise, 
+                food_cons = sum(k_04 + k_05a, na.rm = TRUE))
+  
+  # annualize
+  food$food_cons <- food$food_cons / 7 * 365.24 
+  
+  return (food)
+}
+
+nonfoodcons <- function (df, sec_m = TRUE) {
+  
+  # keep the first 4 columns, while subsequently dropping every other column
+  df <- cbind(df[1:4], df[c(F, T)][c(-1, -2)])
+  
+  # melt to long shape
+  df <- melt(df, 
+             id.vars = c("Country", "Landscape..", "Household.ID", "Data.entry.date"),
+             variable.name = "nonfood.code",
+             value.name = "amount.spent")
+  
+  #list of items measured weekly.  All other items measured monthly
+  weekly <- c('l_101_2', 'l_102_2', 'l_103_2', 'l_199_2', 'l_204_2', 'l_206_2', 'l_207_2', 'l_207_2a')
+  
+  df[df$nonfood.code %in% weekly,'amount.spent'] <- df[df$nonfood.code %in% weekly,'amount.spent']/7*365.24
+  df[!df$nonfood.code %in% weekly,'amount.spent'] <- df[!df$nonfood.code %in% weekly,'amount.spent']/31*365.24
+  
+  
+  # sum valued nonfood consumption by household
+  nonfood <- ddply(df, 
+                   .(Household.ID), 
+                   summarise, 
+                   nonfood_cons = sum(amount.spent, na.rm = TRUE))
+  
+  
+  #THERE IS AN ERROR HERE HE DOESNT ANNUALIZE CORRECTLY
+  # annualize nonfood consumption
+  
+  return(nonfood)
+  
+}
+
 
 #################
 # Staging
 #################
 
-# need to add landscape
-hh_sec_a <- subset(hh_sec_a, 
+hh_sec_a <- subset(hh_sec_a, Country=='UGA',
                    select = c(Country, Region, District, Household.ID, Landscape..,
                               Data.entry.date))
 
 # valued food consumption
-hh_sec_k1 <- subset(hh_sec_k1,
+hh_sec_k1 <- subset(hh_sec_k1, Country=='UGA',
                     select = c(Country, Household.ID, k_item, k_item_code, k_04, k_05a))
 
 hh_sec_k2$Landscape.. <- NULL
