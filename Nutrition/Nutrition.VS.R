@@ -1,7 +1,6 @@
 #############################
 # Workflow - Nutrition
 # scale - Individual, Landscape
-# 29 June 2016 - ongoing
 #
 # input the following modules from the VS Server
 #   hh_sec_a, 
@@ -23,30 +22,31 @@
 # libraries
 # Utility package for CI Vital Signs project
 
-library(plyr)
+library(dplyr)
 library(zoo)
 
+pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
+
+vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
+                      user=pg_conf$user, password=pg_conf$pass,
+                      port=pg_conf$port)
+
 # Read datasets and only keep variables for nutrition thread
-hh_sec_a <- read.csv("hh_secA.csv", stringsAsFactors = F)
-hh_sec_b <- read.csv("hh_secB.csv", stringsAsFactors = F)
-hh_sec_u <- read.csv("hh_secU.csv", stringsAsFactors = F)
-landscape <- read.csv("landscape.csv", stringsAsFactors = F)
+hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM curation__household")) %>%
+  select(Country, Region, `Landscape #`, District, `Household ID`, `Data entry date`) %>%
+  data.frame
 
-# ISSUE32 need to add date of interview when it is added
-# Date of interview 
-hh_sec_a <- subset(hh_sec_a, 
-                   select = c(Country, Region, Landscape.., District, Household.ID, 
-                              Data.entry.date))
+hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secB"')) %>%
+  select(`Household ID`, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
+  data.frame
 
-# Sex, age
-hh_sec_b <- subset(hh_sec_b, 
-                   select = c(Household.ID, Individual.ID, hh_b02, hh_b03))
+hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secU"')) %>%
+  select(`Household ID`, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
+  data.frame
 
-# weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
-hh_sec_u <- subset(hh_sec_u, 
-                   select = c(Household.ID, Individual.ID, 
-                              u1_01, u2_01, u3_01, u4_01, u5_01, u6_01))
-
+landscape <- tbl(vs_db, 'landscape') %>%
+  data.frame
+    
 # Restore reference data sets
 weianthro <- read.table("WHO Anthro reference tables/weianthro.txt", header=T)
 lenanthro <- read.table("WHO Anthro reference tables/lenanthro.txt", header=T)
@@ -158,3 +158,11 @@ nutrition_coords$LandscapeCode <- NULL
 
 write.csv(nutrition_coords, 'Nutrition.Individual.csv', row.names = F)
 
+nutrition_landscape <- group_by(nutrition_coords, Country, Landscape.., latitude, longitude) %>% 
+  summarise(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T),
+            percent_stunted=mean(stunting, na.rm=T)*100, percent_severe_stunted=mean(severe_stunting, na.rm=T)*100,
+            percent_underweight=mean(underweight, na.rm=T)*100, percent_severe_underweight=mean(severe_underweight, na.rm=T)*100,
+            percent_wasting=mean(wasting, na.rm=T)*100, percent_server_wasting=mean(severe_wasting, na.rm=T)*100,
+            percent_overweight=mean(overweight, na.rm=T)*100, percent_Composite_Index_Anthropometric_Failure=mean(CIAF, na.rm=T)*100)
+
+write.csv(nutrition_landscape, 'Nutrition.Landscape.csv', row.names = F)
