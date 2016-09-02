@@ -3,4 +3,5 @@
 .RData
 .httr-oauth
 .swp
+.html
 rds_settings

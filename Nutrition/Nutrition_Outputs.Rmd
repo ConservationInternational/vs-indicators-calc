@@ -1,0 +1,92 @@
+---
+title: "Nutrition Graphics"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(maps)
+library(mapdata)
+library(calibrate)
+library(dplyr)
+library(ggplot2)
+
+nutrition_coords <- read.csv('Nutrition.Individual.csv')
+nutrition_landscape <- read.csv('Nutrition.Landscape.csv')
+
+average_per_country_records <- nutrition_coords$Country %>% table %>% mean
+
+usa_data <- data.frame(Country='WHO Healthy Children',
+                       zlen=rnorm(average_per_country_records, 0, 1),
+                       zwei=rnorm(average_per_country_records, 0, 1),
+                       zwfl=rnorm(average_per_country_records, 0, 1))
+
+nutrition <- bind_rows(nutrition_coords, usa_data)
+
+#Create a function to generate a continuous color palette
+rbPal <- colorRampPalette(c('blue','red'))
+
+#This adds a column of color values
+# based on the y values
+nutrition_landscape$color <- rbPal(10)[as.numeric(cut(nutrition_landscape$percent_Composite_Index_Anthropometric_Failure,breaks = 10))]
+
+```
+
+##Histograms of nutrition 
+
+```{r, echo=FALSE, warning=FALSE}
+
+#Stunting
+ggplot(nutrition, aes(zlen, fill = Country)) +
+  geom_density(alpha = 0.2) + 
+  ggtitle("Ditribution of children's heights") + 
+  geom_vline(aes(xintercept = -2, colour='Stunting')) + 
+  geom_vline(aes(xintercept = -3, colour='Severe Stunting'), size=1) + 
+  xlab('Z-scores for childrens height by age')
+
+#Wasting
+ggplot(nutrition, aes(zwfl, fill = Country)) +
+  geom_density(alpha = 0.2) + 
+  ggtitle("Ditribution of children's weights for height") + 
+  geom_vline(aes(xintercept = -2, colour='Wasting')) + 
+  geom_vline(aes(xintercept = -3, colour='Severe Wasting'), size=1) + 
+  xlab('Z-scores for childrens weigth/height by age')
+
+#Underweight
+ggplot(nutrition, aes(zwei, fill = Country)) +
+  geom_density(alpha = 0.2) + 
+  ggtitle("Ditribution of children's weights") + 
+  geom_vline(aes(xintercept = -2, colour='Underweight')) + 
+  geom_vline(aes(xintercept = -3, colour='Severe Underweight'), size=1) + 
+  xlab('Z-scores for childrens weigth by age')
+
+```
+
+
+##Percentage of children with Anthropometric Failure
+
+```{r, echo=FALSE}
+map('worldHires', 'Ghana') 
+sel <- nutrition_landscape[nutrition_landscape$Country=='GHA' , ]
+title('Ghana')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%'), cex=1)
+
+map('worldHires', 'Tanzania') 
+sel <- nutrition_landscape[nutrition_landscape$Country=='TZA' , ]
+title('Tanzania')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%'), cex=0.7)
+
+map('worldHires', 'Rwanda')
+title('Rwanda')
+sel <- nutrition_landscape[nutrition_landscape$Country=='RWA' , ]
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%'), cex=1)
+
+map('worldHires', 'Uganda')
+title('Uganda')
+sel <- nutrition_landscape[nutrition_landscape$Country=='UGA' , ]
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%'), cex=1)
+
+```
