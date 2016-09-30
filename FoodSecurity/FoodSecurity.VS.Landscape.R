@@ -16,24 +16,25 @@
 #################
 
 library(reshape2)
-library(plyr)
+library(dplyr)
 library(lubridate)
 
-#################
-# Loading
-#################
+pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
+
+vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
+                      user=pg_conf$user, password=pg_conf$pass,
+                      port=pg_conf$port)
 
 # Vital Signs Datasets
-metadata <- read.csv("hh_secA.csv")
-food_spending <- read.csv("hh_secK1.csv") #FS 6
-food_consumption <- read.csv("hh_secK2.csv") #FS 9
-nonfood_spending <- read.csv("hh_secL.csv") #FS 7
-
-food_insecurity <- read.csv("hh_secI.csv") #FS 5
-crop_production <- read.csv("agric_sec4_crops_by_field.csv") #FS 1
-fruit_prodcution <- read.csv("agric_sec6_permanent_crops_by_field.csv") #FS 1
-livestock <- read.csv("agric_sec10a_livestock.csv") #FS 2
-by_prouducts <- read.csv("agric_sec10b_livestock.csv") #FS 2
+metadata <- tbl(vs_db, "curation__household") %>% data.frame
+food_spending <- tbl(vs_db, "curation__household_secK1") %>% data.frame #FS 6
+food_consumption <- tbl(vs_db, "curation__household_secK2") %>% data.frame(stringsAsFactors=F) #FS 9
+nonfood_spending <- tbl(vs_db, "curation__household_secL") %>% data.frame #FS 7
+food_insecurity <- tbl(vs_db, "curation__household_secI") %>% data.frame #FS 5
+crop_production <- tbl(vs_db, "curation__agric_crops_by_field") %>% data.frame #FS 1
+fruit_prodcution <- tbl(vs_db, "curation__agric_perm_crops_by_field") %>% data.frame #FS 1
+livestock <- tbl(vs_db, "curation__agric_livestock") %>% data.frame #FS 2
+by_prouducts <- tbl(vs_db, "curation__agric_livestock_byproduct") %>% data.frame #FS 2
 
 
 
@@ -50,10 +51,7 @@ foodcons <- function(df) {
   df$k_04[is.na(df$k_04) ] <- 0  #NA counts as 0 spending
   df$k_05a[is.na(df$k_05a) ] <- 0  #NA counts as 0 hypothetical spending
   
-  food <- ddply(df, 
-                .(Household.ID), 
-                summarise, 
-                food_cons = sum(k_04 + k_05a, na.rm = TRUE))
+  food <- df %>% group_by(Household.ID) %>% summarise(food_cons = sum(k_04 + k_05a, na.rm = TRUE))
   
   # annualize
   food$food_cons <- food$food_cons / 7 * 365.24 
@@ -64,7 +62,7 @@ foodcons <- function(df) {
 nonfoodcons <- function (df, sec_m = TRUE) {
   
   # keep the first 4 columns, while subsequently dropping every other column
-  df <- cbind(df[1:4], df[c(F, T)][c(-1, -2)])
+  df <- df[ , c('Country', 'Landscape..', 'Household.ID', 'Data.entry.date', names(df)[grepl('_2$', names(df))])]
   
   # melt to long shape
   df <- melt(df, 
@@ -79,10 +77,7 @@ nonfoodcons <- function (df, sec_m = TRUE) {
   df[!df$nonfood.code %in% weekly,'amount.spent'] <- df[!df$nonfood.code %in% weekly,'amount.spent']/31*365.24
   
   # sum valued nonfood consumption by household
-  nonfood <- ddply(df, 
-                   .(Household.ID), 
-                   summarise, 
-                   nonfood_cons = sum(amount.spent, na.rm = TRUE))
+  nonfood <- df %>% group_by(Household.ID) %>% summarise(nonfood_cons = sum(amount.spent, na.rm = TRUE))
   
   return(nonfood)
   
@@ -92,16 +87,13 @@ nonfoodcons <- function (df, sec_m = TRUE) {
 # Staging
 #################
 
-metadata <- ddply(metadata, .(Country, Household.ID, Landscape..), summarize, Data.entry.date=mean(mdy(Data.entry.date)))
-
-metadata$Landscape.. <- revalue(metadata$Landscape.., c("4"="L04", "5"="L05", "6"="L06", "18"="L18", "10"="L10"))
+metadata <- metadata  %>% group_by(Country, Household.ID, Landscape.., latitude, longitude) %>% summarize(Data.entry.date=mean(ymd(Data.entry.date)))
 
 food_spending <- subset(food_spending, select = c(Country, Household.ID, k_item, k_item_code, k_04, k_05a))
 
-food_consumption <- ddply(food_consumption, .(Country, Household.ID, Landscape..), summarize, k2_8_a=mean(k2_8_a, na.rm=T), k2_8_b=mean(k2_8_b, na.rm=T),
+food_consumption <- food_consumption %>% group_by(Country, Household.ID, Landscape..) %>% summarize(k2_8_a=mean(k2_8_a, na.rm=T), k2_8_b=mean(k2_8_b, na.rm=T),
                           k2_8_c=mean(k2_8_c, na.rm=T), k2_8_d=mean(k2_8_d, na.rm=T), k2_8_e=mean(k2_8_e, na.rm=T), k2_8_f=mean(k2_8_f, na.rm=T), k2_8_g=mean(k2_8_g, na.rm=T), k2_8_h=mean(k2_8_h, na.rm=T),
-                          k2_8_i=mean(k2_8_i, na.rm=T), k2_8_j=mean(k2_8_j, na.rm=T), k2_9=mean(k2_9, na.rm=T), k2_10_a=mean(k2_10_a, na.rm=T), k2_11_a=mean(k2_11_a, na.rm=T),
-                          k2_10_b=mean(k2_10_b, na.rm=T), k2_11_b=mean(k2_11_b, na.rm=T), k2_10_c=mean(k2_10_c, na.rm=T), k2_11_c=mean(k2_11_c, na.rm=T), k2_10_d=mean(k2_10_d, na.rm=T), k2_11_d=mean(k2_11_d, na.rm=T))
+                          k2_8_i=mean(k2_8_i, na.rm=T), k2_8_j=mean(k2_8_j, na.rm=T))
 
 #FS 7
 food.cons <- foodcons(food_spending)
@@ -115,10 +107,7 @@ food_spending$k_05a[is.na(food_spending$k_05a) ] <- 0
 nonstaple <- merge(staple[staple$non.staple == "Y",], 
                    food_spending,  by.x = "item", by.y = "k_item")
 
-nonstaple.cons <- ddply(nonstaple, 
-                        .(Household.ID), 
-                        summarise, 
-                        staple_cons = sum(k_04 + k_05a, na.rm = TRUE))
+nonstaple.cons <- nonstaple %>% group_by(Household.ID) %>% summarise(staple_cons = sum(k_04 + k_05a, na.rm = TRUE))
 
 # merge together
 foodsec <- merge(nonfood.cons, food.cons, all = TRUE)
@@ -188,11 +177,9 @@ for (k in unique(foodsec$key)){
                                access = access,
                                utilization = utilization)
   
-  foodsec.df <- rbind.fill(foodsec.df, foodsec.df1)
+  foodsec.df <- bind_rows(foodsec.df, foodsec.df1)
 }
 
-coord_alias <- read.csv('landscape.csv')
-coord_alias <- rename(coord_alias, replace = c("landscape_no" = "landscape", 'lower_right_latitude'='latitude', 'lower_right_longitude'='longitude'))
-foodsec.df.final <- merge(foodsec.df, coord_alias[,c('country', 'landscape', 'latitude', 'longitude')], all.x = T)
+foodsec.df.final <- merge(foodsec.df, unique(metadata[,c('Country', 'Landscape..', 'latitude', 'longitude')]), by.x=c('country', 'landscape'), by.y=c('Country', 'Landscape..'), all.x = T)
 
 write.csv(foodsec.df.final, 'FoodSecurity.VS.Landscape.csv', row.names = F)
