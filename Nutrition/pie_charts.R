@@ -126,11 +126,6 @@ dev.off()
 }
 
 for (c in unique(nut$Country)){
-  generateMaps(c, nut)
-}
-  
-  
-for (c in unique(nut$Country)){
   ls <- unique(nut[nut$Country==c, 'Landscape..'])
   for (l in ls){
     for (v in c('stunting', 'wasting', 'underweight', 'any')){
@@ -140,3 +135,6 @@ for (c in unique(nut$Country)){
   }
 }
 
+for (c in unique(nut$Country)){
+  generateMaps(c, nut)
+}

@@ -19,8 +19,6 @@
 #################
 # Setup
 #################
-# libraries
-# Utility package for CI Vital Signs project
 
 library(dplyr)
 library(zoo)
@@ -33,7 +31,7 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 
 # Read datasets and only keep variables for nutrition thread
 hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM curation__household")) %>%
-  select(Country, Region, `Landscape #`, District, `Household ID`, `Data entry date`) %>%
+  select(Country, Region, `Landscape #`, District, `Household ID`, `Questionnaire inspection date`) %>%
   data.frame
 
 hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secB"')) %>%
@@ -72,14 +70,14 @@ nutrition$hh_b02 <- NULL
 # N24. Age
 nutrition$hh_b03 <- as.Date(substr(nutrition$hh_b03, 1, 10))
 # ISSUE32 change to Date of the interview when added
-nutrition$Data.entry.date <- as.Date(nutrition$Data.entry.date)
+nutrition$Data.collection.date <- as.Date(nutrition$Questionnaire.inspection.date)
 
 # age in months
 # ISSUE32 change to Date of the interview when added
-nutrition$age <- (as.yearmon(nutrition$Data.entry.date) - 
+nutrition$age <- (as.yearmon(nutrition$Data.collection.date) - 
   as.yearmon(nutrition$hh_b03)) * 12
 
-nutrition$intyr <- as.integer(format(nutrition$Data.entry.date, "%Y"))
+nutrition$intyr <- as.integer(format(nutrition$Data.collection.date, "%Y"))
 
 # N25. Height / N26. Weight / N27. Upper arm circumference
 
