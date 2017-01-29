@@ -164,3 +164,8 @@ nutrition_landscape <- group_by(nutrition_coords, Country, Landscape.., latitude
             percent_overweight=mean(overweight, na.rm=T)*100, percent_Composite_Index_Anthropometric_Failure=mean(CIAF, na.rm=T)*100)
 
 write.csv(nutrition_landscape, 'Nutrition.Landscape.csv', row.names = F)
+
+copy_to(vs_db, nutrition_df, "indicators__nutrition", temporary=F)
+
+
+

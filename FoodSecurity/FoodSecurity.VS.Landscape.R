@@ -183,3 +183,6 @@ for (k in unique(foodsec$key)){
 foodsec.df.final <- merge(foodsec.df, unique(metadata[,c('Country', 'Landscape..', 'latitude', 'longitude')]), by.x=c('country', 'landscape'), by.y=c('Country', 'Landscape..'), all.x = T)
 
 write.csv(foodsec.df.final, 'FoodSecurity.VS.Landscape.csv', row.names = F)
+
+copy_to(vs_db, foodsec.df.final, "indicators__food_security", temporary=F)
+
