@@ -51,7 +51,7 @@ generateIndividuals <- function(c, l, v, nut){
       panel.grid.minor = element_blank(), 
       panel.grid.major = element_blank(),
       plot.background = element_rect(fill = "transparent",colour = NA),
-      #legend.position = "none",
+      legend.position = "none",
       axis.text = element_blank(),
       axis.ticks = element_blank()) + 
     scale_fill_manual(values = c("severe_stunting"='#f6ff00', "stunting"="#61ff00", "no_stunting"='#2b8e12',

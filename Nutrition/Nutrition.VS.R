@@ -30,15 +30,15 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 # Read datasets and only keep variables for nutrition thread
-hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM curation__household")) %>%
+hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM flagging__household")) %>%
   select(Country, Region, `Landscape #`, District, `Household ID`, `Questionnaire inspection date`) %>%
   data.frame
 
-hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secB"')) %>%
+hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secB"')) %>%
   select(`Household ID`, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
   data.frame
 
-hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secU"')) %>%
+hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secU"')) %>%
   select(`Household ID`, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
   data.frame
 
@@ -165,6 +165,7 @@ nutrition_landscape <- group_by(nutrition_coords, Country, Landscape.., latitude
 
 write.csv(nutrition_landscape, 'Nutrition.Landscape.csv', row.names = F)
 
+db_drop_table(vs_db$con, table='indicators__nutrition')
 copy_to(vs_db, nutrition_df, "indicators__nutrition", temporary=F)
 
 

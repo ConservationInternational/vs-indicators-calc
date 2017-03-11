@@ -184,5 +184,6 @@ foodsec.df.final <- merge(foodsec.df, unique(metadata[,c('Country', 'Landscape..
 
 write.csv(foodsec.df.final, 'FoodSecurity.VS.Landscape.csv', row.names = F)
 
+db_drop_table(vs_db$con, table='indicators__food_security')
 copy_to(vs_db, foodsec.df.final, "indicators__food_security", temporary=F)
 
