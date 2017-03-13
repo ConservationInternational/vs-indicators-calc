@@ -1,6 +1,8 @@
 library(dplyr)
 library(reshape2)
 
+setwd('../NaturalResources/')
+
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
 con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
@@ -26,10 +28,10 @@ hv1.2 <- tbl(con, 'flagging__household_secHV2') %>%
   group_by(Country) %>%
   summarize(cost=median(hh_hv105b_01, na.rm=T)) %>% data.frame %>%
   merge(hv1.1)
-hv1.2$total_cost <- hv1.2$cost * hv1.2$bundles
+hv1.2$total_fuelwood_value <- hv1.2$cost * hv1.2$bundles
 
 hv1 <- hv1.2 %>% group_by(Country, Landscape..) %>% 
-  summarize(Mean_Annual_Fuelwood_Value=mean(total_cost, na.rm=T))
+  summarize(Mean_Annual_Fuelwood_Value=mean(total_fuelwood_value, na.rm=T))
 
 #Other HH-level fuelwood stats
 hv2.1 <- tbl(con, 'flagging__household_secHV2') %>% 
@@ -81,12 +83,16 @@ hv2.2 <- merge(hv2.2, data.frame(freq=c("1", "2", "3", "4"), rate=c(52, 12, 4, 1
 hv2.2$annual_price <- hv2.2$price * hv2.2$rate
 hv2.2$nr_is_decreasing <- hv2.2$avail == "1"
 
-hv2.2 <- hv2.2 %>% group_by(Country, Landscape..) %>%
-  summarize(Nonfuel_NR_annual_value = mean(annual_price, na.rm=T),
+hv2.3 <- hv2.2 %>% group_by(Country, Landscape.., Household.ID) %>%
+  summarize(hh_annual_nonfuel_nr_value = sum(annual_price, na.rm=T),
             Nonfuel_NR_decreasing = mean(nr_is_decreasing, na.rm=T))
 
+hv2.4 <- hv2.3 %>% group_by(Country, Landscape..) %>%
+  summarize(Nonfuel_NR_annual_value = mean(hh_annual_nonfuel_nr_value, na.rm=T),
+            Nonfuel_NR_decreasing = mean(Nonfuel_NR_decreasing, na.rm=T))
+
 #% of households that collect any natural resources
-hv2.3 <- tbl(con, 'flagging__household_secHV2') %>% 
+hv2.5 <- tbl(con, 'flagging__household_secHV2') %>% 
   select(Country, `Landscape #`, survey_uuid, hv2_10_01, hv2_10_02, hv2_10_03, hv2_10_04,
          hv2_10_05, hv2_10_06, hv2_10_07, hv2_10_08, hv2_10_09) %>% data.frame %>%
   melt(id.vars=c("Country", "Landscape..", 'survey_uuid'), value.name = 'collects') %>%
@@ -94,6 +100,12 @@ hv2.3 <- tbl(con, 'flagging__household_secHV2') %>%
   group_by(Country, Landscape..) %>% summarize(Collects_Nonfuel_Resources=mean(collects, na.rm=T))
 
 
-hv <- merge(merge(merge(hv1, hv2.1), hv2.2), hv2.3)
+hv <- Reduce(f=merge, x=list(hv1, hv2.1, hv2.4, hv2.5))
 
-write.csv(hv, 'NaturalResources.csv', row.names=F)
+write.csv(hv, 'NaturalResources.Landscape.csv', row.names=F)
+
+#HH Level Vars
+
+hv.hh <- Reduce(f=merge, x=list(hv1.1, hv1.2, hv2.3))
+write.csv(hv.hh, 'NaturalResources.HH.csv', row.names=F)
+

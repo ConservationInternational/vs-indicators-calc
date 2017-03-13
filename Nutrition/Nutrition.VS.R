@@ -23,6 +23,8 @@
 library(dplyr)
 library(zoo)
 
+setwd('../Nutrition/')
+
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
 vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
@@ -39,7 +41,8 @@ hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secB"')) %>
   data.frame
 
 hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secU"')) %>%
-  select(`Household ID`, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
+  filter(flag=='') %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
+  select(`Household ID`, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>%
   data.frame
 
 landscape <- tbl(vs_db, 'landscape') %>%
@@ -168,5 +171,7 @@ write.csv(nutrition_landscape, 'Nutrition.Landscape.csv', row.names = F)
 db_drop_table(vs_db$con, table='indicators__nutrition')
 copy_to(vs_db, nutrition_df, "indicators__nutrition", temporary=F)
 
+nut_hh <- nutrition_coords %>% group_by(Country, Landscape.., Household.ID) %>%
+  summarize(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T))
 
-
+write.csv(nut_hh, 'Nutrition.Household.csv', row.names=F)
