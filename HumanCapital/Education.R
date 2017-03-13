@@ -30,6 +30,12 @@ hh_size <- ed %>% group_by(Country, Landscape.., latitude, longitude, survey_uui
 capital <- ed %>% group_by(Country, Landscape.., latitude, longitude) %>%
   summarize(literate=mean(literate, na.rm=T), years=mean(years, na.rm=T), age=mean(hh_b04))
 
+household_capital <- merge(hh_size, capital)
+write.csv(household_capital, 'hh_captital.csv', row.names=F)
+
 ed$is_female <- ed$hh_b02=='2'
 gender <- ed %>% filter(hh_b05=='1') %>% group_by(Country, Landscape.., latitude, longitude) %>%
   summarize(female=mean(is_female))
+
+
+

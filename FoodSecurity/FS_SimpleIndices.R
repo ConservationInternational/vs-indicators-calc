@@ -30,3 +30,6 @@ diet$diversity <- rowSums(diet[f_groups] / 7, na.rm=T) / length(f_groups)
 dd <- diet %>% group_by(Country, Landscape.., latitude, longitude) %>%
   summarize(diet_diversity = mean(diversity))
 
+out <- merge(result, dd)
+
+write.csv(out, 'fs_outputs.csv', row.names=F)
