@@ -2,9 +2,8 @@
 
 tmp <- read.csv('./crops.csv')
 
-str <- "INSERT INTO layers(id, name, slug, layer_type, active, info, layer_provider, css, opacity, query, created_at, updated_at, locate_layer, published, legend, zoom_max, zoom_min, download)\nVALUES"
+str <- "INSERT INTO layers(name, slug, layer_type, active, info, layer_provider, css, opacity, query, created_at, updated_at, locate_layer, published, legend, zoom_max, zoom_min, download)\nVALUES"
 
-id <- 818
 layer_type <- "'layer'"
 active <- "'f'"
 layer_provider <- "'cartodb'"
@@ -27,12 +26,11 @@ for (i in 1:nrow(tmp)){
   css <- gsub('coloradjus', tmp$col[i], "'#crops {polygon-fill: #FFFFB2;  polygon-opacity: 0.8; line-color: #FFF; line-width: 0.5;line-opacity: 1;}#crops [ coloradjus <= 1] {polygon-fill: #B10026;  }#crops [ coloradjus <= 0.6] {polygon-fill: #E31A1C;  }#crops [ coloradjus <= 0.4] {polygon-fill: #FC4E2A;  }#crops [ coloradjus <= 0.25] {polygon-fill: #FD8D3C;  }#crops [ coloradjus <= 0.12] {polygon-fill: #FEB24C;  }#crops [ coloradjus <= 0.04] {polygon-fill: #FED976;  }#crops [ coloradjus <= 0.01] {polygon-fill: #FFFFB2;}'")
   query <- paste0("'SELECT l.the_geom_webmercator, c.", tmp$col[i], " FROM crops c JOIN vs_landscape_march_2017 l ON c.country = l.country AND c.landscape=l.landscape_no'")
   
-  substr <- paste(as.character(id), name, slug, layer_type, active, info, layer_provider, css, opacity, query, created_at, updated_at, locate_layer, published, legend, zoom_max, zoom_min, download, sep = ', ')
+  substr <- paste(name, slug, layer_type, active, info, layer_provider, css, opacity, query, created_at, updated_at, locate_layer, published, legend, zoom_max, zoom_min, download, sep = ', ')
   substr <- paste0('(', substr, ')')
   
   str <- paste0(str, substr, ',\n')
-  
-  id <- id + 1
+
 }
 
 cat(str, file='insertscript.sql')
@@ -40,10 +38,9 @@ cat(str, file='insertscript.sql')
 
 #Insert script for 'agrupations' table
 
-str <- "INSERT INTO agrupations (id, layer_id, layer_group_id)\nVALUES"
-id <- 1250
+str <- "INSERT INTO agrupations (ayer_id, layer_group_id)\nVALUES"
 for (i in 818:853){
-  str <- paste0(str, '(',as.character(id), ",", as.character(i), ",666),\n")
+  str <- paste0(str, '(', as.character(i), ",666),\n")
   id <- id + 1
 }
 
