@@ -1,6 +1,8 @@
 library(dplyr)
 library(reshape2)
 
+setwd('../Crops/')
+
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
 vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
@@ -8,13 +10,12 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 crops <- tbl(vs_db, 'flagging__agric_field_roster') %>% 
-  select(survey_uuid, Country, latitude, longitude, `Landscape #`, ag2a_vs_2d1, ag2a_vs_2b2_1) %>%
+  select(survey_uuid, Country, `Landscape #`, ag2a_vs_2d1, ag2a_vs_2b2_1) %>%
   data.frame
 
-crops <- melt(crops, id.vars=c('survey_uuid', 'Country', 'latitude', 
-                               'longitude', 'Landscape..'))
+crops <- melt(crops, id.vars=c('survey_uuid', 'Country', 'Landscape..'))
 
-sum <- crops %>% group_by(survey_uuid, Country, latitude, longitude, Landscape..) %>%
+sum <- crops %>% group_by(survey_uuid, Country, Landscape..) %>%
   summarize(Bananas = '71' %in% value | '71a' %in% value | '71b' %in% value | '71c' %in% value,
             Maize = "11" %in% value,
             Paddy = "12" %in% value,
@@ -51,7 +52,7 @@ sum <- crops %>% group_by(survey_uuid, Country, latitude, longitude, Landscape..
             Egg.Plant = "94" %in% value,
             Okra = "100" %in% value,
             Timber = "304" %in% value) %>%
-  group_by(Country, latitude, longitude, Landscape..) %>%
+  group_by(Country, Landscape..) %>%
   summarize(Bananas = mean(Bananas),
             Maize = mean(Maize),
             Paddy = mean(Paddy),

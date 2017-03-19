@@ -159,7 +159,7 @@ nutrition_coords$LandscapeCode <- NULL
 
 write.csv(nutrition_coords, 'Nutrition.Individual.csv', row.names = F)
 
-nutrition_landscape <- group_by(nutrition_coords, Country, Landscape.., latitude, longitude) %>% 
+nutrition_landscape <- group_by(nutrition_coords, Country, Landscape..) %>% 
   summarise(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T),
             percent_stunted=mean(stunting, na.rm=T)*100, percent_severe_stunted=mean(severe_stunting, na.rm=T)*100,
             percent_underweight=mean(underweight, na.rm=T)*100, percent_severe_underweight=mean(severe_underweight, na.rm=T)*100,

@@ -1,32 +1,38 @@
+detach("package:plyr", unload=TRUE)
+detach("package:dplyr", unload=TRUE)
+
 library(plyr)
 library(dplyr)
+
+setwd('../Gender')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secB"')) %>%
+hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secB"')) %>%
+  select(-flag, -uuid, ) %>%
   data.frame
 
-hh_sec_c <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secC"')) %>%
+hh_sec_c <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secC"')) %>%
   data.frame
 
-hh_sec_e <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secE"')) %>%
+hh_sec_e <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secE"')) %>%
   data.frame
 
-hh_sec_hv1 <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secHV1"')) %>%
+hh_sec_hv1 <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secHV1"')) %>%
   data.frame
 
 hh_all <- 
-  merge(hh_sec_b, hh_sec_c, by=c("Household.ID", "Individual.ID", "Landscape..", "Country")) %>%
-  select(Country, Landscape.., Household.ID, Individual.ID, hh_b02, hh_b04, hh_c02, hh_c03, hh_c07) %>%
+  merge(hh_sec_b, hh_sec_c, by=c("Household.ID", "Individual.ID", "Landscape..", "Country", "Round")) %>%
+  select(Country, Landscape.., Household.ID, Individual.ID, Round, hh_b02, hh_b04, hh_b05, hh_c02, hh_c03, hh_c07) %>%
   
-  merge(hh_sec_e, by=c("Household.ID", "Individual.ID", "Landscape..", "Country")) %>%
-  select(Country, Landscape.., Household.ID, Individual.ID, hh_b02, hh_b04, hh_c02, hh_c03, hh_c07, hh_e04, hh_e25, hh_e24_1, hh_e24_2, hh_e52, hh_e06, hh_e65_1, hh_e65_2) %>%
+  merge(hh_sec_e, by=c("Household.ID", "Individual.ID", "Landscape..", "Country", "Round")) %>%
+  select(Country, Landscape.., Household.ID, Individual.ID, Round, hh_b02, hh_b04, hh_b05, hh_c02, hh_c03, hh_c07, hh_e04, hh_e25, hh_e24_1, hh_e24_2, hh_e52, hh_e06, hh_e65_1, hh_e65_2) %>%
   
-  merge(hh_sec_hv1, by=c("Household.ID", "Individual.ID", "Landscape..", "Country")) %>%
-  select(Country, Landscape.., Household.ID, Individual.ID, hh_b02, hh_b04, hh_c02, hh_c03, hh_c07, hh_e04, hh_e25, hh_e24_1, hh_e24_2, hh_e52, hh_e06, hh_e65_1, hh_e65_2, hh_hv103, hh_hv104, hh_hv105, hh_hv105_unit, hh_hv105a) %>%
+  merge(hh_sec_hv1, by=c("Household.ID", "Individual.ID", "Landscape..", "Country", "Round")) %>%
+  select(Country, Landscape.., Household.ID, Individual.ID, hh_b02, hh_b04, hh_c02, hh_b05, hh_c03, hh_c07, hh_e04, hh_e25, hh_e24_1, hh_e24_2, hh_e52, hh_e06, hh_e65_1, hh_e65_2, hh_hv103, hh_hv104, hh_hv105, hh_hv105_unit, hh_hv105a) %>%
   
   data.frame
 
@@ -97,6 +103,16 @@ data <- hh_all %>% group_by(Country, Landscape.., Gender) %>% summarize(Mean.Hou
 all_data <- merge(all_data, data, all=T)
 
 
+## Household Head
+hh_all$Household.Head <- hh_all$hh_b05 == '1'
+
+head <- hh_all %>% filter(Household.Head) %>%
+  group_by(Country, Landscape..) %>%
+  summarize(Male.HH.Head = mean(Gender=='Male'),
+            Female.HH.Head = mean(Gender=='Female'))
+
+
+
 #order
 male_df <- all_data %>% filter(Gender=='Male')
 names(male_df) <- c("Country", "Landscape..", paste0("Male.", names(male_df)[3:10]))
@@ -104,6 +120,6 @@ names(male_df) <- c("Country", "Landscape..", paste0("Male.", names(male_df)[3:1
 female_df <- all_data %>% filter(Gender=='Female')
 names(female_df) <- c("Country", "Landscape..", paste0("Female.", names(female_df)[3:10]))
 
-all <- merge(male_df, female_df)
+all <- Reduce(merge, list(male_df, female_df, head))
 
 write.csv(all, 'Gender.csv', row.names=F)
