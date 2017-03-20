@@ -69,10 +69,10 @@ landscape_df <- data.frame(Landscape..=c('L07', 'L04', 'L03', 'L01', 'L06', 'L02
 
 yield_input <- merge(yield_input, landscape_df)
 
-ys <- yield_input %>% filter(Investment > 0 & Country == 'RWA')
+ys <- yield_input %>% filter(Investment > 0)
 
 ggplot(ys, aes(x=log(Investment), y=log(Crops/USD))) + 
-  geom_point(aes(color=Location)) +
+  geom_point(aes(color=Country)) +
   geom_smooth(method = "lm", se = FALSE) + theme_bw() + 
   ggtitle("Agricultural Investments and Returns in Rwanda") + 
   xlab("Value of Annual Crops (USD)") + ylab("Value of Investment in Agriculture (USD)") + 
@@ -109,6 +109,11 @@ biodiversity_hh <- merge(hh_id, biodiversity)
 bio_hh_ag <- merge(biodiversity_hh, intensification)
 
 bio_hh_ag_y <- merge(bio_hh_ag, allvars)
+
+
+landscape <- bio_hh_ag_y %>% group_by(Country, Landscape..) %>% summarize(bio=mean(biodiversity), fert=mean(pct_fields_inorganic_fert, na.rm=T))
+
+ggplot(landscape) + geom_point(aes(x=bio, y=fert, col=Country))
 
 lmer(Yield_PerArea ~ biodiversity + pesticide + herbicide + fungicide + pct_buy_seed + (1|Country) + (1|Landscape..) + Investment, data=bio_hh_ag_y[bio_hh_ag_y$Crop.name=='Beans', ]) %>% summary
 

@@ -69,3 +69,13 @@ ggplot() +
   ggtitle("Agriculture, Natural Resources, and Stunting") + 
   xlab('Annual Value of Agricultural Production (USD)') + 
   ylab('Annual Value of Natural Resource Gathering (USD)')
+
+
+
+ls <- read.csv('../Combine/landscape_level.csv')
+
+
+ggplot(ls %>% filter(Country != 'GHA')) + geom_point(aes(x=TotalAgriculturalProduction, y=Nonfuel_NR_annual_value, size=percent_severe_stunted, color=Country))
+
+
+

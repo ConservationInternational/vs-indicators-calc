@@ -171,7 +171,11 @@ write.csv(nutrition_landscape, 'Nutrition.Landscape.csv', row.names = F)
 db_drop_table(vs_db$con, table='indicators__nutrition')
 copy_to(vs_db, nutrition_df, "indicators__nutrition", temporary=F)
 
-nut_hh <- nutrition_coords %>% group_by(Country, Landscape.., Household.ID, Round) %>%
-  summarize(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T))
+nut_hh <- nutrition_coords %>% group_by(Country, Landscape.., Household.ID, Round) %>% 
+  summarise(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T),
+            percent_stunted=mean(stunting, na.rm=T)*100, percent_severe_stunted=mean(severe_stunting, na.rm=T)*100,
+            percent_underweight=mean(underweight, na.rm=T)*100, percent_severe_underweight=mean(severe_underweight, na.rm=T)*100,
+            percent_wasting=mean(wasting, na.rm=T)*100, percent_server_wasting=mean(severe_wasting, na.rm=T)*100,
+            percent_overweight=mean(overweight, na.rm=T)*100, percent_Composite_Index_Anthropometric_Failure=mean(CIAF, na.rm=T)*100)
 
 write.csv(nut_hh, 'Nutrition.HH.csv', row.names=F)

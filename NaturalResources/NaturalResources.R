@@ -39,13 +39,16 @@ hv1 <- hv1.2 %>% group_by(Country, Landscape..) %>%
 
 #Other HH-level fuelwood stats
 hv2.1 <- tbl(con, 'flagging__household_secHV2') %>% 
-  select(Country, `Landscape #`,hh_hv109_01, hh_hv109b_01, hh_hv105c_01) %>%
-  group_by(Country, `Landscape #`) %>% data.frame
+  select(Country, `Landscape #`, `Household ID`, Round, hh_hv109_01, hh_hv109b_01, hh_hv105c_01) %>% 
+  data.frame
+
 hv2.1$fw_is_decreasing <- hv2.1$hh_hv109_01 == "1"
 hv2.1$not_enough_fw_past_year <- hv2.1$hh_hv109b_01 == "1"
 hv2.1$fw_from_wilderness <- hv2.1$hh_hv105c_01 %in% c('1', '1a', '1b', '2', '6')
 
-hv2.1 <- hv2.1 %>% group_by(Country, Landscape..) %>%
+hv2.1 <- hv2.1 %>% select(fw_is_decreasing, not_enough_fw_past_year, fw_from_wilderness, Country, Landscape.., Household.ID, Round)
+
+hv2.1.1 <- hv2.1 %>% group_by(Country, Landscape..) %>%
   summarize(Fuelwood_Decreasing = mean(fw_is_decreasing, na.rm=T),
             Fuelwood_Shortage_Past_Year = mean(not_enough_fw_past_year, na.rm=T),
             Fuelwood_From_Natural_Areas = mean(fw_from_wilderness, na.rm=T)) %>%
@@ -104,7 +107,7 @@ hv2.5 <- tbl(con, 'flagging__household_secHV2') %>%
   group_by(Country, Landscape..) %>% summarize(Collects_Nonfuel_Resources=mean(collects, na.rm=T))
 
 
-hv <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1, hv2.1, hv2.4, hv2.5))
+hv <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1, hv2.1.1, hv2.4, hv2.5))
 
 write.csv(hv, 'NaturalResources.Landscape.csv', row.names=F)
 
