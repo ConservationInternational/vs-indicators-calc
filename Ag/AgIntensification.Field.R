@@ -2,7 +2,7 @@ library(dplyr)
 library(ineq)
 detach("package:raster", unload=TRUE)
 
-setwd('../')
+setwd('../Ag')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
@@ -15,9 +15,9 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 #####################################################
 
 allvars <- tbl(con, "flagging__agric") %>%
-  select(survey_uuid, Country, `Landscape #`, `Household ID`) %>%
+  select(survey_uuid, Country, `Landscape #`, `Household ID`, Round) %>%
   data.frame %>%
-  select(survey_uuid, Country, Landscape.., Household.ID)
+  select(survey_uuid, Country, Landscape.., Household.ID, Round)
 
 
 # Field Size - agric_field_roster

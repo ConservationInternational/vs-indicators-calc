@@ -1,20 +1,19 @@
 library(dplyr)
 library(ineq)
 
+setwd('D://Documents and Settings/mcooper/GitHub/vs-indicators-calc/Ag')
+
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
 con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-#####################################################
-#Independant Vars indicative of Ag Intensification
-#####################################################
-
+#accumulator
 allvars <- tbl(con, "flagging__agric") %>%
-  select(survey_uuid, Country, `Landscape #`, `Household ID`) %>%
+  select(survey_uuid, Country, `Landscape #`, `Household ID`, Round) %>%
   data.frame %>%
-  select(survey_uuid, Country, Landscape.., Household.ID)
+  select(survey_uuid, Country, Landscape.., Household.ID, Round)
 
 
 # Field Size - agric_field_roster
@@ -226,7 +225,7 @@ numfields <- tbl(con, 'flagging__agric_field_roster') %>%
   group_by(survey_uuid) %>% summarize(number_fields=n()) %>%
   data.frame
 
-allvars <- merge(allvars, numfields)
+allvars <- merge(allvars, numfields, all.x=T)
 
 ################################
 #Total Area Owned
@@ -245,11 +244,13 @@ combo$ag2a_09[is.na(combo$ag2a_09)] <- 0
 hh_total <- combo %>% group_by(survey_uuid) %>% 
   summarize(Total_Area_Owned=sum(ag2a_09))
 
-allvars <- merge(allvars, hh_total)
+allvars <- merge(allvars, hh_total, all.x=T)
 
 #########################################
 #Summarize to Landscape Level
 #################################
+
+write.csv(allvars, 'AgIntensification.HH.csv', row.names=F)
 
 allsum <- allvars %>% group_by(Country, Landscape..) %>%
   summarize(median_field_size=median(median_field_size, na.rm=T), 
@@ -267,7 +268,7 @@ allsum <- allvars %>% group_by(Country, Landscape..) %>%
             Mean_Area_Owned=mean(Total_Area_Owned),
             Area_Owned_Ineq_Gini=ineq(Total_Area_Owned))
 
-write.csv(allsum, 'AgIntensification.csv', row.names=F)
+write.csv(allsum, 'AgIntensification.Landscape.csv', row.names=F)
 
 
 

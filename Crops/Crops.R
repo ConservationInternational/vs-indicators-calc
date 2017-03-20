@@ -1,7 +1,7 @@
 library(dplyr)
 library(reshape2)
 
-setwd('../Crops/')
+setwd('D://Documents and Settings/mcooper/GitHub/vs-indicators-calc/Crops/')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
@@ -9,13 +9,19 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-crops <- tbl(vs_db, 'flagging__agric_field_roster') %>% 
-  select(survey_uuid, Country, `Landscape #`, ag2a_vs_2d1, ag2a_vs_2b2_1) %>%
+hh <- tbl(vs_db, 'flagging__agric') %>%
+  select(Country, `Household ID`, Round, `Landscape #`) %>%
   data.frame
 
-crops <- melt(crops, id.vars=c('survey_uuid', 'Country', 'Landscape..'))
+crops <- tbl(vs_db, 'flagging__agric_field_roster') %>% 
+  select(`Household ID`, Round, Country, `Landscape #`, ag2a_vs_2d1, ag2a_vs_2b2_1) %>%
+  data.frame
 
-sum <- crops %>% group_by(survey_uuid, Country, Landscape..) %>%
+crops <- merge(hh, crops, all=T)
+
+crops <- melt(crops, id.vars=c('Household.ID', 'Round', 'Country', 'Landscape..'))
+
+sum_hh <- crops %>% group_by(Household.ID, Round, Country, Landscape..) %>%
   summarize(Bananas = '71' %in% value | '71a' %in% value | '71b' %in% value | '71c' %in% value,
             Maize = "11" %in% value,
             Paddy = "12" %in% value,
@@ -51,8 +57,9 @@ sum <- crops %>% group_by(survey_uuid, Country, Landscape..) %>%
             Chilies = "90" %in% value,
             Egg.Plant = "94" %in% value,
             Okra = "100" %in% value,
-            Timber = "304" %in% value) %>%
-  group_by(Country, Landscape..) %>%
+            Timber = "304" %in% value) %>% data.frame
+
+sum <- sum_hh %>% group_by(Country, Landscape..) %>%
   summarize(Bananas = mean(Bananas),
             Maize = mean(Maize),
             Paddy = mean(Paddy),
@@ -90,4 +97,6 @@ sum <- crops %>% group_by(survey_uuid, Country, Landscape..) %>%
             Okra = mean(Okra),
             Timber = mean(Timber))
 
-write.csv(sum, 'crops.csv', row.names=F)
+write.csv(sum_hh, 'crops.hh.csv', row.names=F)
+
+write.csv(sum, 'crops.landscape.csv', row.names=F)

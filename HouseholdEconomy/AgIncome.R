@@ -1,7 +1,7 @@
 library(dplyr)
 library(ineq)
 
-setwd('../Ag')
+setwd('D://Documents and Settings/mcooper/GitHub/vs-indicators-calc/HouseholdEconomy/')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
@@ -14,7 +14,7 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 ##############################################
 
 allvars <- tbl(con, "flagging__agric") %>%
-  select(survey_uuid, Country, `Landscape #`, `Household ID`, Round) %>%
+  select(Country, `Landscape #`, `Household ID`, Round) %>%
   data.frame
 
 # Income
@@ -148,7 +148,7 @@ inc6 <- inc6 %>% group_by(Household.ID, Round) %>% summarize(cost_seeds = sum(ag
 
 inc6[is.na(inc6)] <- 0
 
-allvars <- merge(allvars, inc6)
+allvars <- merge(allvars, inc6, all.x=T)
 
 #  agric_field_details
 #    ag3a_32 What was the total value of [FERTILIZER] purchased?
@@ -165,7 +165,7 @@ inc7 <- inc7 %>% group_by(Household.ID, Round) %>% summarize(cost_org_fert = sum
 
 inc7[is.na(inc7)] <- 0
 
-allvars <- merge(allvars, inc7)
+allvars <- merge(allvars, inc7, all.x=T)
 
 ###################
 ##Results
@@ -183,6 +183,11 @@ allvars$NonAgIncome <- rowSums(allvars[ , c("income_own", "income_wage")], na.rm
 allvars$AgInvestments <- rowSums(allvars[ , c("cost_seeds", "cost_org_fert", "cost_syn_fert",
                                               "cost_pesticide")], na.rm = T)
 
+allvars <- allvars %>% select(Country, Landscape.., Household.ID, Round,
+                              TotalIncome, AgIncome, NonAgIncome, AgCosts)
+
+write.csv(allvars, 'Income.HH.csv', row.names=F)
+
 income <- allvars %>% group_by(Country, Landscape..) %>%
   summarize(TotalIncome = mean(Total_Income),
             AgIncome = mean(AgIncome),
@@ -190,4 +195,4 @@ income <- allvars %>% group_by(Country, Landscape..) %>%
             AgCosts = mean(AgInvestments),
             Income_Inequality_Gini = ineq(Total_Income, type='Gini'))
 
-write.csv(income, 'income.csv', row.names=F)
+write.csv(income, 'Income.Landscape.csv', row.names=F)

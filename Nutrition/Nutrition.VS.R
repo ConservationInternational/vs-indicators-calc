@@ -23,7 +23,7 @@
 library(dplyr)
 library(zoo)
 
-setwd('../Nutrition/')
+setwd('D://Documents and Settings/mcooper/GitHub/vs-indicators-calc/Nutrition/')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
@@ -33,16 +33,16 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 
 # Read datasets and only keep variables for nutrition thread
 hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM flagging__household")) %>%
-  select(Country, Region, `Landscape #`, District, `Household ID`, `Questionnaire inspection date`) %>%
+  select(Country, Region, `Landscape #`, District, `Household ID`, Round, `Questionnaire inspection date`) %>%
   data.frame
 
 hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secB"')) %>%
-  select(`Household ID`, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
+  select(`Household ID`, Round, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
   data.frame
 
 hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secU"')) %>%
   filter(flag=='') %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
-  select(`Household ID`, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>%
+  select(`Household ID`, Round, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>%
   data.frame
 
 landscape <- tbl(vs_db, 'landscape') %>%
@@ -61,9 +61,9 @@ tsanthro <- read.table("WHO Anthro reference tables/tsanthro.txt", header=T)
 
 # Merge datasets into one "nutrition" dataset
 nutrition <- merge(hh_sec_a, hh_sec_b, 
-                   by = "Household.ID", all = TRUE)
+                   by = c("Household.ID", "Round"), all = TRUE)
 nutrition <- merge(nutrition, hh_sec_u, 
-                   by = c("Household.ID", "Individual.ID"), all = TRUE)
+                   by = c("Household.ID", "Individual.ID", "Round"), all = TRUE)
 
 # Household and individual ID
 # N23. Gender (M=1, F=2)
@@ -93,7 +93,7 @@ nutrition$measure[nutrition$measure == "STANDING"] <- "1"
 nutrition$measure[nutrition$measure == "LYING DOWN"] <- "2"
 
 # ISSUE32 need to add date of interview when it is added
-vars <- c("Country", "Region", "District", "Landscape..", 
+vars <- c("Country", "Region", "District", "Landscape..", "Round",
           "Household.ID", "Individual.ID",  "intyr", "age", 
           "weight", "lenhei", "armc", "measure", "sex")
 
@@ -136,7 +136,7 @@ matz$zwei[matz$fwei==1] <- NA
 matz$zwfl[matz$fwfl==1] <- NA
 matz <- matz[matz$age > 6, ]
 
-nutrition_df <- matz[,c('Country', 'Landscape..', 'Household.ID', 'Individual.ID', 'zlen', 'zwei', 'zwfl')] 
+nutrition_df <- matz[,c('Country', 'Landscape..', 'Household.ID', 'Individual.ID', 'Round', 'zlen', 'zwei', 'zwfl')] 
 
 nutrition_df$stunting <- ifelse(nutrition_df$zlen < -2, 1, 0)
 nutrition_df$severe_stunting <- ifelse(nutrition_df$zlen < -3, 1, 0)
@@ -171,7 +171,7 @@ write.csv(nutrition_landscape, 'Nutrition.Landscape.csv', row.names = F)
 db_drop_table(vs_db$con, table='indicators__nutrition')
 copy_to(vs_db, nutrition_df, "indicators__nutrition", temporary=F)
 
-nut_hh <- nutrition_coords %>% group_by(Country, Landscape.., Household.ID) %>%
+nut_hh <- nutrition_coords %>% group_by(Country, Landscape.., Household.ID, Round) %>%
   summarize(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T))
 
-write.csv(nut_hh, 'Nutrition.Household.csv', row.names=F)
+write.csv(nut_hh, 'Nutrition.HH.csv', row.names=F)
