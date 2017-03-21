@@ -265,7 +265,7 @@ allsum <- allvars %>% group_by(Country, Landscape..) %>%
             Pct_Fields_Inorg_Fert=mean(pct_fields_inorganic_fert, na.rm=T),
             Pct_Fields_Purchased_Seed=mean(pct_buy_seed, na.rm=T),
             Mean_HH_Number_Fields=mean(number_fields, na.rm=T), 
-            Mean_Area_Owned=mean(Total_Area_Owned),
+            Mean_Area_Owned=mean(Total_Area_Owned, na.rm=T),
             Area_Owned_Ineq_Gini=ineq(Total_Area_Owned))
 
 write.csv(allsum, 'AgIntensification.Landscape.csv', row.names=F)

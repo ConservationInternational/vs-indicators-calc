@@ -34,10 +34,13 @@ ls$NonAgIncome <- ls$NonAgIncome / ls$Rate
 ls$Mean_Annual_Fuelwood_Value <- ls$Mean_Annual_Fuelwood_Value / ls$Rate
 ls$Nonfuel_NR_annual_value <- ls$Nonfuel_NR_annual_value / ls$Rate
 
+
+ls$CropCommercializationIndex <- ls$AgIncome / ls$TotalAgriculturalProduction
+
 write.csv(ls, 'landscape_level.csv', row.names=F)
 
 bio <- read.csv('../Biophysical/Biophysical.csv')
-write.csv(bio, 'eplot_level.csv')
+write.csv(bio, 'eplot_level.csv', row.names=F)
 
 fs <- read.csv('../FoodSecurity/FoodSecurity.HH.csv')
 ag_intens <- read.csv('../Ag/AgIntensification.HH.csv')
@@ -88,6 +91,7 @@ hh$cost_syn_fert <- hh$cost_syn_fert / hh$Rate
 hh$cost_org_fert <- hh$cost_org_fert / hh$Rate
 hh$income_byprod <- hh$income_byprod / hh$Rate
 
+hh$CropCommercializationIndex <- hh$AgIncome / ls$TotalAgriculturalProduction
 
 hh <- hh %>% filter(Country != 'GHA' & Round == 1)
 

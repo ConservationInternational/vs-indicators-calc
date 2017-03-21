@@ -1,6 +1,6 @@
 library(dplyr)
 
-setwd('D:/Documents and Settings/mcooper/GitHub/vitalsigns-analysis/TreeBiodiversity')
+setwd('D:/Documents and Settings/mcooper/GitHub/vs-indicators-calc/Biophysical/')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
@@ -79,7 +79,7 @@ treecov <- tbl(con, 'flagging__eplot_subplot_woody_canopy') %>%
          `Densiometer N`, `Densiometer S`, `Densiometer E`, `Densiometer W`) %>%
   data.frame %>%
   group_by(survey_uuid, Country, latitude, longitude) %>%
-  summarize(Canopy = mean((Densiometer.N + Densiometer.S + Densiometer.E + Densiometer.W)/4))
+  summarize(Canopy = (mean((Densiometer.N + Densiometer.S + Densiometer.E + Densiometer.W)/4)))
 
 ######################
 #LandscapeFN
@@ -133,6 +133,6 @@ eplot <- merge(eplot, landscapefn, by=c('latitude', 'longitude', 'Country', 'sur
 
 eplot <- merge(eplot, soils, by=c('Country', 'Landscape..', 'Eplot..'), all.x=T, all.y=F)
 
-write.csv(eplot, 'Biophysical.csv')
+write.csv(eplot, 'Biophysical.csv', row.names=F)
 
 
