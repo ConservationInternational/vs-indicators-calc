@@ -246,12 +246,6 @@ hh_total <- combo %>% group_by(survey_uuid) %>%
 
 allvars <- merge(allvars, hh_total, all.x=T)
 
-#########################################
-#Summarize to Landscape Level
-#################################
-
-write.csv(allvars, 'AgIntensification.HH.csv', row.names=F)
-
 allsum <- allvars %>% group_by(Country, Landscape..) %>%
   summarize(median_field_size=median(median_field_size, na.rm=T), 
             Mean_HH_Area_Farmed=mean(Total_Area_Farmed, na.rm=T),
@@ -268,13 +262,24 @@ allsum <- allvars %>% group_by(Country, Landscape..) %>%
             Mean_Area_Owned=mean(Total_Area_Owned, na.rm=T),
             Area_Owned_Ineq_Gini=ineq(Total_Area_Owned))
 
-write.csv(allsum, 'AgIntensification.Landscape.csv', row.names=F)
 
+#########################################
+#Write
+#################################
 
+library(aws.s3)
+aws.signature::use_credentials()
 
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
 
-
-
-
-
-
+writeS3(allvars, 'AgIntensification_HH.csv')
+writeS3(allsum, 'AgIntensification_Landscape.csv')

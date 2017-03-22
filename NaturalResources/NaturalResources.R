@@ -109,10 +109,30 @@ hv2.5 <- tbl(con, 'flagging__household_secHV2') %>%
 
 hv <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1, hv2.1.1, hv2.4, hv2.5))
 
-write.csv(hv, 'NaturalResources.Landscape.csv', row.names=F)
 
 #HH Level Vars
 
 hv.hh <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1.1, hv1.2, hv2.3, hh))
-write.csv(hv.hh, 'NaturalResources.HH.csv', row.names=F)
+
+
+#########################################
+#Write
+#################################
+
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+writeS3(hv, 'NaturalResources_Landscape.csv')
+writeS3(hv.hh, 'NaturalResources_HH.csv')
 

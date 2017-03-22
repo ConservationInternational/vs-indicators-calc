@@ -84,8 +84,6 @@ food <- df %>% group_by(Country, Landscape.., Household.ID, Round) %>%
 out <- Reduce(function(x, y){merge(x, y, all=T)}, list(fs, diet, nfs3, food))
 out$Food_As_Percent_Total_Spending <- (out$Food.Spending/(out$Food.Spending + out$Nonfood.Spending))*100
 
-write.csv(out, 'FoodSecurity.HH.csv', row.names=F)
-
 out_ls <- out %>% group_by(Country, Landscape..) %>%
   summarize(avg_meals = mean(number_meals, na.rm=T),
             Percent_Shortage_Past_Year = mean(shortage_year, na.rm=T)*100,
@@ -95,4 +93,24 @@ out_ls <- out %>% group_by(Country, Landscape..) %>%
             Mean_Food_Spending = mean(Food.Spending, na.rm=T),
             Food_As_Percent_Total_Spending = mean(Food_As_Percent_Total_Spending, na.rm=T))
 
-write.csv(out_ls, 'FoodSecurity.Landscape.csv', row.names=F)
+#########################################
+#Write
+#################################
+
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+
+writeS3(out, 'FoodSecurity_HH.csv')
+writeS3(out_ls, 'FoodSecurity_Landscape.csv')

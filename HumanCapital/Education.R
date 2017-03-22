@@ -33,7 +33,6 @@ capital <- ed %>% group_by(Country, Landscape.., Household.ID, Round) %>%
   summarize(literate=mean(literate, na.rm=T), years=mean(years, na.rm=T), age=mean(hh_b04))
 
 household_capital <- merge(hh_size, capital)
-write.csv(household_capital, 'Capital.HH.csv', row.names=F)
 
 hc <- household_capital %>% group_by(Country, Landscape..) %>%
   summarize(size=mean(size, na.rm=T),
@@ -41,4 +40,24 @@ hc <- household_capital %>% group_by(Country, Landscape..) %>%
             years = mean(years, na.rm=T),
             age = mean(age, na.rm=T))
 
-write.csv(hc, 'Capital.Landscape.csv', row.names=F)
+
+#########################################
+#Write
+#################################
+
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+writeS3(household_capital, 'Capital_HH.csv')
+writeS3(hc, 'Capital_Landscape.csv')

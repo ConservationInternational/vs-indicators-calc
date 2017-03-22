@@ -45,6 +45,23 @@ eros <- eros_hh %>% group_by(Country, Landscape..) %>%
             Bad_Soil=mean(Bad_Soil, na.rm=T),
             erosion_control_household_percent = mean(erosion_control, na.rm=T))
 
-write.csv(eros_hh, 'ErosionControl.HH.csv', row.names=F)
+#########################################
+#Write
+#################################
 
-write.csv(eros, 'ErosionControl.Landscape.csv', row.names=F)
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+writeS3(eros_hh, 'ErosionControl_HH.csv')
+writeS3(eros, 'ErosionControl_Landscape.csv')

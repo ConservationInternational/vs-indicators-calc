@@ -118,8 +118,6 @@ names(female_df) <- c("Country", "Landscape..", "Household.ID", "Round", paste0(
 
 all <- Reduce(function(x,y){merge(x,y,all=T)}, list(male_df, female_df, head))
 
-write.csv(all, 'Gender.HH.csv', row.names=F)
-
 all_sum <- all %>% group_by(Country, Landscape..) %>%
   summarize(Male.Literacy.Rate = mean(Male.Literacy.Rate, na.rm=T),
             Male.Percent.Attended.School = mean(Male.Percent.Attended.School, na.rm=T),
@@ -138,7 +136,27 @@ all_sum <- all %>% group_by(Country, Landscape..) %>%
             Male.HH.Head = mean(HH.Head.Gender == 'Male', na.rm=T),
             Female.HH.Head = mean(HH.Head.Gender == 'Female', na.rm=T))
             
-write.csv(all_sum, 'Gender.Landscape.csv', row.names=F)
+#########################################
+#Write
+#################################
+
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+
+writeS3(all, 'Gender_HH.csv')
+writeS3(all_sum, 'Gender_Landscape.csv')
             
             
             

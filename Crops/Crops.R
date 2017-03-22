@@ -97,6 +97,23 @@ sum <- sum_hh %>% group_by(Country, Landscape..) %>%
             Okra = mean(Okra),
             Timber = mean(Timber))
 
-write.csv(sum_hh, 'crops.hh.csv', row.names=F)
+####################
+#Write to S3
+####################
 
-write.csv(sum, 'crops.landscape.csv', row.names=F)
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+writeS3(sum_hh, "Crops_HH.csv")
+writeS3(sum, "Crops_Landscape.csv")

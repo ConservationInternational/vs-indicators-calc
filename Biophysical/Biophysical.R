@@ -133,6 +133,25 @@ eplot <- merge(eplot, landscapefn, by=c('latitude', 'longitude', 'Country', 'sur
 
 eplot <- merge(eplot, soils, by=c('Country', 'Landscape..', 'Eplot..'), all.x=T, all.y=F)
 
-write.csv(eplot, 'Biophysical.csv', row.names=F)
+#########################################
+#Write
+#################################
+
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  names(df)[names(df)=='Eplot__'] <- 'Eplot'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+writeS3(eplot, 'Biophysical.csv')
 
 

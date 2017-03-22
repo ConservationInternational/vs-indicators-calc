@@ -184,9 +184,7 @@ allvars$AgInvestments <- rowSums(allvars[ , c("cost_seeds", "cost_org_fert", "co
                                               "cost_pesticide")], na.rm = T)
 
 allvars <- allvars %>% select(Country, Landscape.., Household.ID, Round,
-                              TotalIncome, AgIncome, NonAgIncome, AgCosts)
-
-write.csv(allvars, 'Income.HH.csv', row.names=F)
+                              Total_Income, AgIncome, NonAgIncome, AgInvestments)
 
 income <- allvars %>% group_by(Country, Landscape..) %>%
   summarize(TotalIncome = mean(Total_Income),
@@ -195,4 +193,24 @@ income <- allvars %>% group_by(Country, Landscape..) %>%
             AgCosts = mean(AgInvestments),
             Income_Inequality_Gini = ineq(Total_Income, type='Gini'))
 
-write.csv(income, 'Income.Landscape.csv', row.names=F)
+#########################################
+#Write
+#################################
+
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+
+writeS3(allvars, 'Income_HH.csv')
+writeS3(income, 'Income_Landscape.csv')

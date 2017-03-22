@@ -26,8 +26,6 @@ toilet$No_Measure_Safe_Drinking_Water <- toilet$hh_j16_1 == '7'
 toilet <- toilet %>% select(Country, Landscape.., Household.ID, Round, No_Toilet, Flush_Toilet, Pit_Latrine, Satisfied_Drinking_Water,
                             Unsatisfied_Drinking_Water, Dispose_Garbage_Within_Compound, No_Measure_Safe_Drinking_Water)
 
-write.csv(toilet, 'WatSan.HH.csv', row.names=F)
-
 toilet_sum <- toilet %>% group_by(Country, Landscape..) %>%
   summarize(No_Toilet = mean(No_Toilet, na.rm=T),
             Flush_Toilet = mean(Flush_Toilet, na.rm=T),
@@ -37,4 +35,25 @@ toilet_sum <- toilet %>% group_by(Country, Landscape..) %>%
             Dispose_Garbage_Within_Compound = mean(Dispose_Garbage_Within_Compound, na.rm=T),
             No_Measure_Safe_Drinking_Water = mean(No_Measure_Safe_Drinking_Water, na.rm=T))
 
-write.csv(toilet_sum, 'WatSan.Landscape.csv', row.names=F)
+
+#########################################
+#Write
+#################################
+
+library(aws.s3)
+aws.signature::use_credentials()
+
+writeS3 <- function(df, name){
+  names(df) <- gsub('.', '_', names(df), fixed=T)
+  names(df)[names(df)=='Landscape__'] <- 'Landscape'
+  
+  zz <- rawConnection(raw(0), "r+")
+  write.csv(df, zz, row.names=F)
+  aws.s3::put_object(file = rawConnectionValue(zz),
+                     bucket = "vs-cdb-indicators", object = name)
+  close(zz)
+}
+
+writeS3(toilet, 'WatSan_HH.csv')
+
+writeS3(toilet_sum, 'WatSan_Landscape.csv')
