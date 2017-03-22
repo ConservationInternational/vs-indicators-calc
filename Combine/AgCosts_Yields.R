@@ -59,34 +59,60 @@ agvalue <- read.csv('../../vitalsigns-analysis/ValueofNature/AgValue_Household.c
 yield_input <- allvars %>% group_by(Country, Landscape.., Household.ID, USD) %>%
   summarize(Investment = sum(Investment, na.rm=T)) %>% merge(agvalue)
 
+landscape_df <- data.frame(Landscape..=c('L07', 'L04', 'L03', 'L01', 'L06', 'L02'),
+                           Location=c('Other Landscape', 'Other Landscape', 'Other Landscape',
+                                      'Other Landscape', 'Landscape A', 'Landscape B'))
+
+yield_input <- merge(yield_input, landscape_df)
+
 breakfun <- function(x){
   signif(exp(x), digits=2)
 }
 
-landscape_df <- data.frame(Landscape..=c('L07', 'L04', 'L03', 'L01', 'L06', 'L02'),
-                           Location=c('Bugusera', 'Gishwati', 'Akagera',
-                                      'Nyungwe', 'Muhanga', 'Volcanoes'))
-
-yield_input <- merge(yield_input, landscape_df)
-
 ys <- yield_input %>% filter(Investment > 0)
 
-ggplot(ys, aes(x=log(Investment), y=log(Crops/USD))) + 
-  geom_point(aes(color=Country)) +
-  geom_smooth(method = "lm", se = FALSE) + theme_bw() + 
-  ggtitle("Agricultural Investments and Returns in Rwanda") + 
-  xlab("Value of Annual Crops (USD)") + ylab("Value of Investment in Agriculture (USD)") + 
+ggplot(ys %>% filter(Country=='RWA'), aes(x=log(Investment), y=log(Crops/USD))) + 
+  geom_point(aes(color=Location)) +
+  geom_smooth(method='lm', fullrange=TRUE, se=F, color="black") + theme_bw() + 
+  xlab("Value of Investment in Agriculture (USD)") + ylab("Value of Production of Annual Crops (USD)") + 
   scale_x_continuous(labels = breakfun) +
   scale_y_continuous(labels = breakfun)
 
 ggplot(ys, aes(x=log(Investment), y=log(Crops/USD))) + 
   geom_point(aes(color=Location, alpha=ifelse(ys$Location=='Muhanga', 1, .4))) + guides(alpha=FALSE) +
-  geom_smooth(method = "lm", se = FALSE) + theme_bw() + 
-  ggtitle("Agricultural Investments and Returns in Rwanda") + 
-  xlab("Value of Annual Crops (USD)") + ylab("Value of Investment in Agriculture (USD)") + 
+  geom_smooth(method='lm', fullrange=TRUE, se = F, color="black") + theme_bw() + 
+  xlab("Value of Investment in Agriculture (USD)") + ylab("Value of Production of Annual Crops (USD)") + 
   scale_x_continuous(labels = breakfun) +
   scale_y_continuous(labels = breakfun)
-  
+
+ls_m <- yield_input %>% group_by(Country, Landscape.., Location, USD) %>%
+  summarize(Investment = mean(Investment, na.rm=T),
+            Crops = mean(Crops, na.rm=T))
+
+ggplot(ls_m %>% filter(Country=='RWA'), aes(x=Investment, y=Crops/USD)) + 
+  geom_smooth(method='lm', fullrange=TRUE, se=F, color="gray") + 
+  theme_bw() + 
+  geom_point(aes(color=Location), size=2) +
+  scale_color_manual(values=c('#669933', '#c04420', '#FFCC33')) +  
+  xlab("Value of Investment in Agriculture (USD)") + 
+  ylab("Value of Production of Annual Crops (USD)") + 
+  theme(legend.position = c(0.8, 0.16))
+ggsave('D://Documents and Settings/mcooper/Desktop/Images For Presentation/Degradation.png')
+
+
+#VS RED #c04420
+#VS Yellow #FFCC33
+                             #VS Blue #66CCFF
+                             #VS Green #669933
+                             
+                             #VS Light Green  #A4D65E
+                             #VS Orange Red  #FF6C2F
+                             #VS Orange   #F68D2E
+                             
+                             #purple #66CC33
+                             #navy #000080
+
+
 
 ggplot(allvars %>% filter(Crop.name=='Cassava' & Investment == 0)) + geom_histogram(aes(x=Yield_PerArea, fill=paste0(Country, Landscape..)), bins=10)
 

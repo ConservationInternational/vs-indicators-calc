@@ -1,7 +1,6 @@
 library(ggplot2)
 library(dplyr)
-library(sp)
-library(raster)
+library(reshape2)
 
 setwd('../Combine')
 
@@ -27,55 +26,67 @@ df$Ag_Value[df$Ag_Value < 0] <- 10
 
 df$mzlen <- df$zlen < -2
 
-ggplot(df) + geom_point(aes(x=log(Ag_Value), y=log(NR_Value), color=zlen))# + facet_wrap(~Country)
+df <- df %>% group_by(Country, Landscape..) %>% summarize(Stunting=mean(stunting, na.rm=T), 
+                                                          Natural.Resource.Use=mean(hh_annual_nonfuel_nr_value, na.rm=T),
+                                                          Agricultural.Production=mean(Ag_Value, na.rm=T)) %>%
+  filter(Country == 'UGA')
 
-######################
-##Try Binning
-#####################
+df$Stunting <- df$Stunting/max(df$Stunting)
+df$Natural.Resource.Use <- df$Natural.Resource.Use/max(df$Natural.Resource.Use)
+df$Agricultural.Production <- df$Agricultural.Production/max(df$Agricultural.Production)
 
-sigmean <- function(x, na.rm=T){
-  if(na.rm){
-    x <- na.omit(x)
-  }
-  if (length(x) > 1){
-    return(mean(x))
-  }
-  else{
-    return(NA)
-  }
-}
+df <- melt(df, id.vars=c('Country', 'Landscape..'))
+df$variable <- gsub('.', ' ', df$variable, fixed=T)
 
+ggplot(df %>% filter(Landscape..=='L01'), aes(x=variable, y=value^2)) +
+  geom_bar(aes(fill=variable), stat='identity') + theme_bw() + 
+  scale_fill_manual(values=c('#FFCC33', '#669933', '#c04420')) + 
+  ylab('') + 
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),
+        axis.text.y=element_blank(),axis.ticks=element_blank(),
+        axis.title.x=element_blank(),legend.position="none",
+        panel.grid.minor=element_blank(),plot.background=element_blank()) + 
+  scale_y_continuous(expand = c(0,0), limits=c(0,1.05))
+ggsave('D://Documents and Settings/mcooper/Desktop/Images For Presentation/NR.png')
 
-sp <- df
-sp$y <- log(sp$NR_Value)
-sp$x <- log(sp$Ag_Value)
-coordinates(sp) <- ~ x + y
+ggplot(df %>% filter(Landscape..=='L03'), aes(x=variable, y=value^2)) +
+  geom_bar(aes(fill=variable), stat='identity') + theme_bw() + 
+  scale_fill_manual(values=c('#FFCC33', '#669933', '#c04420')) + 
+  ylab('') + 
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),
+        axis.text.y=element_blank(),axis.ticks=element_blank(),
+        axis.title.x=element_blank(),legend.position="none",
+        panel.grid.minor=element_blank(),plot.background=element_blank()) + 
+  scale_y_continuous(expand = c(0,0), limits=c(0,1.05))
+ggsave('D://Documents and Settings/mcooper/Desktop/Images For Presentation/Ag.png')
 
-r <- raster(nrows=12, ncols=14, xmn=.5, xmx=12, ymn=0.5, ymx=9)
-out <- rasterize(sp, r, field='mzlen', fun=sigmean)
-
-outdf <- out %>% SpatialPoints %>% as.data.frame()
-outdf$stun <- out %>% as.data.frame
-outdf$Percent.Stunted <- outdf$stun * 100
-
-ggplot() +
-  geom_tile(data=outdf,aes(x=x,y=y,fill=Percent.Stunted), alpha = ifelse(is.na(outdf$stun), 0, 1)) + 
-  scale_fill_gradient(low='#2aaf2a', high='#efef2f') + theme_bw() + 
-  #geom_point(data=df, aes(x=log(Ag_Value), y=log(NR_Value), color=as.numeric(mzlen)), alpha = ifelse(is.na(df$zlen), 0, 1)) +
-  scale_x_continuous(expand = c(0, 0), limits=c(2.142856,10.35715), breaks = seq(2.142856,10.35715,by=11.5/14),
-                     labels = signif(exp(seq(2.142856,10.35715,by=11.5/14)), 2)) +
-  scale_y_continuous(expand = c(0, 0), limits=c(2.624999,7.583334), breaks = seq(2.624999,7.583334,by=8.5/12),
-                     labels = signif(exp(seq(2.624999,7.583334,by=8.5/12)), 2)) +
-  ggtitle("Agriculture, Natural Resources, and Stunting") + 
-  xlab('Annual Value of Agricultural Production (USD)') + 
-  ylab('Annual Value of Natural Resource Gathering (USD)')
-
-
-
-ls <- read.csv('../Combine/landscape_level.csv')
+ggplot(df %>% filter(Landscape..=='L04'), aes(x=variable, y=value^2)) +
+  geom_bar(aes(fill=variable), stat='identity') + theme_bw() + 
+  scale_fill_manual(values=c('#FFCC33', '#669933', '#c04420')) + 
+  ylab('') + 
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),
+        axis.text.y=element_blank(),axis.ticks=element_blank(),
+        axis.title.x=element_blank(),legend.position="none",
+        panel.grid.minor=element_blank(),plot.background=element_blank()) + 
+  scale_y_continuous(expand = c(0,0), limits=c(0,1.05))
+ggsave('D://Documents and Settings/mcooper/Desktop/Images For Presentation/Stunting.png')
 
 
-ggplot(ls %>% filter(Country != 'GHA')) + geom_point(aes(x=TotalAgriculturalProduction, y=Nonfuel_NR_annual_value, size=percent_severe_stunted, color=Country))
+ggplot(df %>% filter(Landscape..=='L01'), aes(x=variable, y=value^2)) +
+  geom_bar(aes(fill=variable), stat='identity') + theme_bw() + 
+  scale_fill_manual(values=c('#FFCC33', '#669933', '#c04420')) + 
+  #ylab('High Natural Resource Use')
+ggsave('D://Documents and Settings/mcooper/Desktop/Images For Presentation/ForLegend.png')
 
+library(maps)
+library(mapdata)
 
+ls <- tbl(con, 'flagging__household_secE') %>% 
+  filter(Country == 'UGA') %>% 
+  #select(x=longitude, y=latitude, Country, `Landscape #`) %>%
+  data.frame %>% unique
 
+ls <- ls[ , c('Country', 'Landscape..', 'latitude', 'longitude')] %>% unique
+
+map('worldHires', "Uganda", fill=T, col='#A4D65E')
+points(ls$longitude, ls$latitude, pch=0, col='#FF6C2F', cex=1.2)

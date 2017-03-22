@@ -91,7 +91,9 @@ hh$cost_syn_fert <- hh$cost_syn_fert / hh$Rate
 hh$cost_org_fert <- hh$cost_org_fert / hh$Rate
 hh$income_byprod <- hh$income_byprod / hh$Rate
 
-hh$CropCommercializationIndex <- hh$AgIncome / ls$TotalAgriculturalProduction
+hh$CropCommercializationIndex <- hh$AgIncome / hh$total
+
+hh$CropCommercializationIndex[hh$CropCommercializationIndex < 0] <- 0
 
 hh <- hh %>% filter(Country != 'GHA' & Round == 1)
 
