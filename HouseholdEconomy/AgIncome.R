@@ -186,6 +186,13 @@ allvars$AgInvestments <- rowSums(allvars[ , c("cost_seeds", "cost_org_fert", "co
 allvars <- allvars %>% select(Country, Landscape.., Household.ID, Round,
                               Total_Income, AgIncome, NonAgIncome, AgInvestments)
 
+allvars <- merge(allvars, data.frame(Country = c('GHA', 'RWA', 'UGA', 'TZA'),
+                             Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+
+rateadjust <- c("Total_Income", "AgIncome", "NonAgIncome", "AgInvestments")
+
+allvars[ , rateadjust] <- allvars[ , rateadjust]/allvars$Rate
+
 income <- allvars %>% group_by(Country, Landscape..) %>%
   summarize(TotalIncome = mean(Total_Income),
             AgIncome = mean(AgIncome),

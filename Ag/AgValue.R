@@ -146,6 +146,13 @@ agvalue <- merge(agvalue, ag5, all.x=T)
 
 agvalue$Crop.Byproducts[is.na(agvalue$Crop.Byproducts)] <- 0
 
+agvalue <- merge(agvalue, data.frame(Country = c('GHA', 'RWA', 'UGA', 'TZA'),
+                                     Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+
+rateadjust <- c('Crops', 'Permanent.Crops', 'Livestock.Byproducts', 'Livestock', 'Crop.Byproducts')
+
+agvalue[ , rateadjust] <- agvalue[ , rateadjust]/agvalue$Rate
+
 agvalue$total <- rowSums(agvalue[ , c("Crops", "Permanent.Crops", 
                                       "Livestock.Byproducts", "Livestock", "Crop.Byproducts")])
 

@@ -109,11 +109,21 @@ hv2.5 <- tbl(con, 'flagging__household_secHV2') %>%
 
 hv <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1, hv2.1.1, hv2.4, hv2.5))
 
+hv <- merge(hv, data.frame(Country = c('GHA', 'RWA', 'UGA', 'TZA'),
+                                     Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+
+rateadjust <- c("Mean_Annual_Fuelwood_Value", "Nonfuel_NR_annual_value")
+hv[ , rateadjust] <- hv[ , rateadjust]/hv$Rate
 
 #HH Level Vars
 
 hv.hh <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1.1, hv1.2, hv2.3, hh))
 
+hv.hh <- merge(hv.hh, data.frame(Country = c('GHA', 'RWA', 'UGA', 'TZA'),
+                                     Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+
+rateadjust <- c("total_fuelwood_value", "hh_annual_nonfuel_nr_value")
+hv.hh[ , rateadjust] <- hv.hh[ , rateadjust]/hv.hh$Rate
 
 #########################################
 #Write

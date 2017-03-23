@@ -73,16 +73,23 @@ nfs3$Nonfood.Spending <- nfs3$total.spent.a + nfs3$total.spent.b
 
 nfs3 <- nfs3 %>% select(Country, Landscape.., Household.ID, Round, Nonfood.Spending)
 
+
 ##Food Spending
 df <- tbl(vs_db, "flagging__household_secK1") %>% data.frame #FS 6
 
 food <- df %>% group_by(Country, Landscape.., Household.ID, Round) %>% 
   summarise(Food.Consumption.Value = sum(k_04 + k_05a, na.rm = TRUE)*52.14, Food.Spending = sum(k_04, na.rm=T)*52.14)
 
-
 #Combine and aggregate
 out <- Reduce(function(x, y){merge(x, y, all=T)}, list(fs, diet, nfs3, food))
 out$Food_As_Percent_Total_Spending <- (out$Food.Spending/(out$Food.Spending + out$Nonfood.Spending))*100
+
+out <- merge(out, data.frame(Country = c('GHA', 'RWA', 'UGA', 'TZA'),
+                                     Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+
+rateadjust <- c('Nonfood.Spending', 'Food.Spending', 'Food.Consumption.Value')
+
+out[ , rateadjust] <- out[ , rateadjust]/out$Rate
 
 out_ls <- out %>% group_by(Country, Landscape..) %>%
   summarize(avg_meals = mean(number_meals, na.rm=T),
