@@ -1,119 +1,119 @@
-Group,SubGroup,Name,Col,Legend,Unit,Table
-Food Security,,Number Of Meals,avg_meals,Average Number Of Meals Per Day,,FoodSecurity_Landscape
-Food Security,,Food Shortages,Percent_Shortage_Past_Year,Percentage Of Households Reporting Food Shortages In The Past Year,Percentage,FoodSecurity_Landscape
-Food Security,,Dietary Diversity,Mean_Diet_Diversity,Mean Household Diet Diversity Score,,FoodSecurity_Landscape
-Food Security,,Nonfood Spending,Mean_Nonfood_Spending,Mean Household Annual Nonfood Spending,USD,FoodSecurity_Landscape
-Food Security,,Food Consumption,Mean_Food_Consumption_Value,Mean Household Annual Food Consumption Value,USD,FoodSecurity_Landscape
-Food Security,,Food Spending,Mean_Food_Spending,Mean Household Annual Food Spending,USD,FoodSecurity_Landscape
-Food Security,,Food As A Percentage Of Total Spending,Food_As_Percent_Total_Spending,"Percentage Of All Expenditures On Food, Household Mean",Percentage,FoodSecurity_Landscape
-Agriculture,,Field Sizes,median_field_size,Median Field Size,Acres,AgIntensification_Landscape
-Agriculture,,Area Farmed,Mean_HH_Area_Farmed,Mean Household Area Farmed,Acres,AgIntensification_Landscape
-Agriculture,,Intercropping,Intercrop_Rate,Percentage Of Fields Intercropped,Percentage,AgIntensification_Landscape
-Agriculture,,Pesticides,Pesticide_Rate,Percentage Of Fields Using Pesticides,Percentage,AgIntensification_Landscape
-Agriculture,,Herbicides,Herbicide_Rate,Percentage Of Fields Using Herbicides,Percentage,AgIntensification_Landscape
-Agriculture,,Fungicides,Fungicide_Rate,Percentage Of Fields Using Fungicides,Percentage,AgIntensification_Landscape
-Agriculture,,Yields,Mean_Yield_Quantile,Mean Yield Quartle Across All Crops,,AgIntensification_Landscape
-Agriculture,,Commercialization,Avg_Pct_Crops_Any_Sold,Mean Percentage Of Crops Where Any Amount Was Sold,Percentage,AgIntensification_Landscape
-Agriculture,,Irrigation,Pct_Fields_Irrigated,Percentage Of Fields Irrigated,Percentage,AgIntensification_Landscape
-Agriculture,,Inorganic Fertilizer,Pct_Fields_Inorg_Fert,Percentage Of Fields Using Inorganic Ferilizers,Percentage,AgIntensification_Landscape
-Agriculture,,Seed Purchasing,Pct_Fields_Purchased_Seed,Percentage Of Fields Using Purchased Seeds,Percentage,AgIntensification_Landscape
-Agriculture,,Number Of Fields,Mean_HH_Number_Fields,Mean Household Number Of Fields,,AgIntensification_Landscape
-Agriculture,,Area Owned,Mean_Area_Owned,Mean Household Area Owned,,AgIntensification_Landscape
-Equality,,Land Area Inequality,Area_Owned_Ineq_Gini,Gini Coefficient Of Area Owned,,AgIntensification_Landscape
-Agriculture,Production,Annual Crops,AnnualCropProduction,Mean Household Annual Value Of Production Of Annual Crops,USD,AgValue_Landscape
-Agriculture,Production,Permanent Crops,PermanentCropProduction,Mean Household Annual Value Of Production Of Permanent Crops,USD,AgValue_Landscape
-Agriculture,Production,Livestock Byproducts,LivestockByproductProduction,Mean Household Annual Value Of Production Of Livestock Byproducts,USD,AgValue_Landscape
-Agriculture,Production,Livestock,LivestockProduction,Mean Household Annual Value Of Production Of Livestock,USD,AgValue_Landscape
-Agriculture,Production,Crop Byproducts,CropByproductProduction,Mean Household Annual Value Of Production Of Crop Byproducts,USD,AgValue_Landscape
-Agriculture,Production,Total,TotalAgriculturalProduction,Mean Household Annual Value Of Production Of All Agriculture,USD,AgValue_Landscape
-Equality,,Agricultural Production Inequality,Production_Inequality_Gini,Gini Coefficient Of Agricultural Production,,AgValue_Landscape
-Crops,,Bananas,Bananas,Percent Of Households Growing Bananas,Percentage,Crops_Landscape
-Crops,,Maize,Maize,Percent Of Households Growing Maize,Percentage,Crops_Landscape
-Crops,,Paddy,Paddy,Percent Of Households Growing Paddy,Percentage,Crops_Landscape
-Crops,,Sorghum,Sorghum,Percent Of Households Growing Sorghum,Percentage,Crops_Landscape
-Crops,,Bulrush Millet,Bulrush_Millet,Percent Of Households Growing Bulrush Millet,Percentage,Crops_Landscape
-Crops,,Finger Millet,Finger_Millet,Percent Of Households Growing Finger Millet,Percentage,Crops_Landscape
-Crops,,Wheat,Wheat,Percent Of Households Growing Wheat,Percentage,Crops_Landscape
-Crops,,Cassava,Cassava,Percent Of Households Growing Cassava,Percentage,Crops_Landscape
-Crops,,Sweet Potatoes,Sweet_Potatoes,Percent Of Households Growing Sweet Potatoes,Percentage,Crops_Landscape
-Crops,,Irish Potatoes,Irish_Potatoes,Percent Of Households Growing Irish Potatoes,Percentage,Crops_Landscape
-Crops,,Yams,Yams,Percent Of Households Growing Yams,Percentage,Crops_Landscape
-Crops,,Onions,Onions,Percent Of Households Growing Onions,Percentage,Crops_Landscape
-Crops,,Beans,Beans,Percent Of Households Growing Beans,Percentage,Crops_Landscape
-Crops,,Pigeon Pea,Pigeon_Pea,Percent Of Households Growing Pigeon Pea,Percentage,Crops_Landscape
-Crops,,Field Peas,Field_Peas,Percent Of Households Growing Field Peas,Percentage,Crops_Landscape
-Crops,,Sunflower,Sunflower,Percent Of Households Growing Sunflower,Percentage,Crops_Landscape
-Crops,,Sesame Simsim,Sesame_Simsim,Percent Of Households Growing Sesame Simsim,Percentage,Crops_Landscape
-Crops,,Groundnut,Groundnut,Percent Of Households Growing Groundnut,Percentage,Crops_Landscape
-Crops,,Palm Oil,Palm_Oil,Percent Of Households Growing Palm Oil,Percentage,Crops_Landscape
-Crops,,Coconut,Coconut,Percent Of Households Growing Coconut,Percentage,Crops_Landscape
-Crops,,Cashew Nut,Cashew_Nut,Percent Of Households Growing Cashew Nut,Percentage,Crops_Landscape
-Crops,,Soyabeans,Soyabeans,Percent Of Households Growing Soyabeans,Percentage,Crops_Landscape
-Crops,,Cotton,Cotton,Percent Of Households Growing Cotton,Percentage,Crops_Landscape
-Crops,,Pyrethrum,Pyrethrum,Percent Of Households Growing Pyrethrum,Percentage,Crops_Landscape
-Crops,,Coffee,Coffee,Percent Of Households Growing Coffee,Percentage,Crops_Landscape
-Crops,,Tea,Tea,Percent Of Households Growing Tea,Percentage,Crops_Landscape
-Crops,,Cocoa,Cocoa,Percent Of Households Growing Cocoa,Percentage,Crops_Landscape
-Crops,,Rubber,Rubber,Percent Of Households Growing Rubber,Percentage,Crops_Landscape
-Crops,,Sugar Cane,Sugar_Cane,Percent Of Households Growing Sugar Cane,Percentage,Crops_Landscape
-Crops,,Pineapple,Pineapple,Percent Of Households Growing Pineapple,Percentage,Crops_Landscape
-Crops,,Orange,Orange,Percent Of Households Growing Orange,Percentage,Crops_Landscape
-Crops,,Tomatoes,Tomatoes,Percent Of Households Growing Tomatoes,Percentage,Crops_Landscape
-Crops,,Chilies,Chilies,Percent Of Households Growing Chilies,Percentage,Crops_Landscape
-Crops,,Egg Plant,Egg_Plant,Percent Of Households Growing Egg Plant,Percentage,Crops_Landscape
-Crops,,Okra,Okra,Percent Of Households Growing Okra,Percentage,Crops_Landscape
-Crops,,Timber,Timber,Percent Of Households Growing Timber,Percentage,Crops_Landscape
-Degradation,,Good Soil,Good_Soil,Percent Of Households Reporting Good Soil,Percentage,ErosionControl_Landscape
-Degradation,,Bad Soil,Bad_Soil,Percent Of Households Reporting Bad Soil,Percentage,ErosionControl_Landscape
-Degradation,,Erosion Control,erosion_control_household_percent,Percent Of Households Taking Erosion Control Measures,Percentage,ErosionControl_Landscape
-Degradation,,Area Degraded,perc_degraded,Percent Of Land Area Degraded Since 2003,Percentage,LandCover_Landscape
-Degradation,,Area Improved,perc_improved,Percent Of Land Area Improved Since 2003,Percentage,LandCover_Landscape
-Gender,Men,Literacy Rate,Male_Literacy_Rate,Percentage Of Men Who Can Read In Any Language,Percentage,Gender_Landscape
-Gender,Men,School Attendance,Male_Percent_Attended_School,Percentage Of Men Who Have Attended School,Percentage,Gender_Landscape
-Gender,Men,Recent Work,Male_Percent_Worked_Recently,Percentage Of Men Who Have Worked In Past Week,Percentage,Gender_Landscape
-Gender,Men,Hours Worked Last Week,Male_Mean_Hours_Worked_Last_Week,Mean Hours Working In The Past Week By Men,Percentage,Gender_Landscape
-Gender,Men,Business Operation,Male_Percent_Operated_Business,Percentage Of Men Who Operate A Business,Percentage,Gender_Landscape
-Gender,Men,Firewood Collection,Male_Percent_Collects_Firewood,Percentage Of Men Who Collect Firewood,Percentage,Gender_Landscape
-Gender,Men,Firewood Collection Hours,Male_Mean_Hours_Spent,Mean Hours Spent Collecting Fuelwood By Men,Hours,Gender_Landscape
-Gender,Women,Literacy Rate,Female_Literacy_Rate,Percentage Of Women Who Can Read In Any Language,Percentage,Gender_Landscape
-Gender,Women,School Attendance,Female_Percent_Attended_School,Percentage Of Women Who Have Attended School,Percentage,Gender_Landscape
-Gender,Women,Recent Work,Female_Percent_Worked_Recently,Percentage Of Women Who Have Worked In Past Week,Percentage,Gender_Landscape
-Gender,Women,Hours Worked Last Week,Female_Mean_Hours_Worked_Last_Week,Mean Hours Working In The Past Week By Women,Percentage,Gender_Landscape
-Gender,Women,Business Operation,Female_Percent_Operated_Business,Percentage Of Women Who Operate A Business,Percentage,Gender_Landscape
-Gender,Women,Firewood Collection,Female_Percent_Collects_Firewood,Percentage Of Women Who Collect Firewood,Percentage,Gender_Landscape
-Gender,Women,Firewood Collection Hours,Female_Mean_Hours_Spent,Mean Hours Spent Collecting Fuelwood By Women,Hours,Gender_Landscape
-Gender,Men,Headed Households,Male_HH_Head,Percent Of Households Headed By Males,Percentage,Gender_Landscape
-Gender,Women,Headed Households,Female_HH_Head,Percent Of Households Headed By Females,Percentage,Gender_Landscape
-Income,,Gross Income,TotalIncome,Mean Household Annual Gross Income From All Sources,USD,Income_Landscape
-Income,,Agricultural Income,AgIncome,Mean Household Annual Income From Agriculture,USD,Income_Landscape
-Income,,Non-Agricultural Income,NonAgIncome,Mean Household Annual Income From Non-Agricultural Sources,USD,Income_Landscape
-Income,,Agricultural Costs,AgCosts,Mean Household Annual Cost Of Agriculture,USD,Income_Landscape
-Equality,,Income Inequality,Income_Inequality_Gini,Gini Coefficient Of Income Inequality,,Income_Landscape
-Human Capital,Demographics,Household Size,size,Average Number Of Individuals Per Household,,Capital_Landscape
-Human Capital,Education,Literacy Rate,literate,Percentage Of Individuals Who Can Read In Any Language,,Capital_Landscape
-Human Capital,Education,Years Of Schooling,years,Average Number Of Years Of Schooling Per Individual,,Capital_Landscape
-Human Capital,Demographics,Age,age,Average Age,,Capital_Landscape
-Natural Resources,,Fuelwood Value,Mean_Annual_Fuelwood_Value,Mean Household Annual Value Of Fuelwood Collected,USD,NaturalResources_Landscape
-Natural Resources,,Decreasing Fuelwood Availability,Fuelwood_Decreasing,Percentage Of Households Reporting Decreasing Fuelwood Availability,Percentage,NaturalResources_Landscape
-Natural Resources,,Fuelwood Shortage,Fuelwood_Shortage_Past_Year,Percentage Of Households Reporting Fuelwood Shortages In Past Year,Percentage,NaturalResources_Landscape
-Natural Resources,,Fuelwood From Natural Areas,Fuelwood_From_Natural_Areas,Percentage Of Households Collecting Fuelwood From Natural Areas,Percentage,NaturalResources_Landscape
-Natural Resources,,Non-Fuelwood Natural Resource Value,Nonfuel_NR_annual_value,Mean Household Annual Value Of Non-Fuelwood Gathered Resources,USD,NaturalResources_Landscape
-Natural Resources,,Non-Fuelwood Natural Resources Decreasing,Nonfuel_NR_decreasing,Percentage Of Households Reporting Decreasing  Non-Fuelwood Gathered Resource Availability,Percentage,NaturalResources_Landscape
-Natural Resources,,Percent Collecting Non-Fuelwood Natural Resources,Collects_Nonfuel_Resources,Percentage Of Households Collecting Non-Fuelwood Gathered Resources,Percentage,NaturalResources_Landscape
-Nutrition,,Stunting,percent_stunted,Percentage Of Children Stunted,Percentage,Nutrition_Landscape
-Nutrition,,Severe Stunting,percent_severe_stunted,Percentage Of Children Severely Stunted,Percentage,Nutrition_Landscape
-Nutrition,,Underweight,percent_underweight,Percentage Of Children Underweight,Percentage,Nutrition_Landscape
-Nutrition,,Severe Underweight,percent_severe_underweight,Percentage Of Children Severely Underwieght,Percentage,Nutrition_Landscape
-Nutrition,,Wasting,percent_wasting,Percentage Of Children Wasting,Percentage,Nutrition_Landscape
-Nutrition,,Severe Wasting,percent_server_wasting,Percentage Of Children Severely Wasting,Percentage,Nutrition_Landscape
-Nutrition,,Overweight,percent_overweight,Percentage Of Children Overweight,Percentage,Nutrition_Landscape
-Nutrition,,Any Anthropometric Failutre,percent_Composite_Index_Anthropometric_Failure,Percentage Of Children With Any Anthropometric Failure,Percentage,Nutrition_Landscape
-Water and Sanitation,Toilet,No Toilet,No_Toilet,Percentage Of Households With No Toilet,Percentage,WatSan_Landscape
-Water and Sanitation,Toilet,Flush Toilet,Flush_Toilet,Percentage Of Households With A Flush Toilet,Percentage,WatSan_Landscape
-Water and Sanitation,Toilet,Pit Latrine,Pit_Latrine,Percentage Of Households With A Pit Latrine,Percentage,WatSan_Landscape
-Water and Sanitation,Water Quality,Satisfied With Water Quality,Satisfied_Drinking_Water,Percentage Of Households Satisfied With Their Drinking Water,Percentage,WatSan_Landscape
-Water and Sanitation,Water Quality,Unsatisfied With Water Quality,Unsatisfied_Drinking_Water,Percentage Of Households Unsatisfied With Their Drinking Water,Percentage,WatSan_Landscape
-Water and Sanitation,Garbage,Garbage Disposed Within Compound,Dispose_Garbage_Within_Compound,Percentage Of Households That Dispose Of Garbage Within Their Compound,Percentage,WatSan_Landscape
-Water and Sanitation,Water Quality,No Measure Of Ensuring Safe Drinking Water,No_Measure_Safe_Drinking_Water,Percentage Of Households That Take No Measure Of Ensuring Safe Drinking Water,Percentage,WatSan_Landscape
-Landcover,,Natural Areas,NR_Total,"Percentage Of Land Area With Natural Cover (Trees, Shrubs, Savanna)",Percentage,LandCover_Landscape
-Landcover,,Agriculural Areas,AG_Total,Percentage Of Land Area With Agricultural Cover,Percentage,LandCover_Landscape
+Group,group_id,SubGroup,sub_id,Name,layer_id,Col,Legend,Unit,Table,MinCol,MidCol,MaxCol
+Agriculture,751,Crops,752,Bananas,1008,Bananas,Percent Of Households Growing Bananas,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Beans,1009,Beans,Percent Of Households Growing Beans,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Bulrush Millet,1010,Bulrush_Millet,Percent Of Households Growing Bulrush Millet,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Cashew Nut,1011,Cashew_Nut,Percent Of Households Growing Cashew Nut,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Cassava,1012,Cassava,Percent Of Households Growing Cassava,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Chilies,1013,Chilies,Percent Of Households Growing Chilies,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Cocoa,1014,Cocoa,Percent Of Households Growing Cocoa,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Coconut,1015,Coconut,Percent Of Households Growing Coconut,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Coffee,1016,Coffee,Percent Of Households Growing Coffee,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Cotton,1017,Cotton,Percent Of Households Growing Cotton,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Egg Plant,1018,Egg_Plant,Percent Of Households Growing Egg Plant,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Field Peas,1019,Field_Peas,Percent Of Households Growing Field Peas,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Finger Millet,1020,Finger_Millet,Percent Of Households Growing Finger Millet,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Groundnut,1021,Groundnut,Percent Of Households Growing Groundnut,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Irish Potatoes,1022,Irish_Potatoes,Percent Of Households Growing Irish Potatoes,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Maize,1023,Maize,Percent Of Households Growing Maize,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Okra,1024,Okra,Percent Of Households Growing Okra,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Onions,1025,Onions,Percent Of Households Growing Onions,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Orange,1026,Orange,Percent Of Households Growing Orange,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Paddy,1027,Paddy,Percent Of Households Growing Paddy,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Palm Oil,1028,Palm_Oil,Percent Of Households Growing Palm Oil,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Pigeon Pea,1029,Pigeon_Pea,Percent Of Households Growing Pigeon Pea,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Pineapple,1030,Pineapple,Percent Of Households Growing Pineapple,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Pyrethrum,1031,Pyrethrum,Percent Of Households Growing Pyrethrum,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Rubber,1032,Rubber,Percent Of Households Growing Rubber,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Sesame Simsim,1033,Sesame_Simsim,Percent Of Households Growing Sesame Simsim,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Sorghum,1034,Sorghum,Percent Of Households Growing Sorghum,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Soyabeans,1035,Soyabeans,Percent Of Households Growing Soyabeans,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Sugar Cane,1036,Sugar_Cane,Percent Of Households Growing Sugar Cane,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Sunflower,1037,Sunflower,Percent Of Households Growing Sunflower,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Sweet Potatoes,1038,Sweet_Potatoes,Percent Of Households Growing Sweet Potatoes,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Tea,1039,Tea,Percent Of Households Growing Tea,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Timber,1040,Timber,Percent Of Households Growing Timber,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Tomatoes,1041,Tomatoes,Percent Of Households Growing Tomatoes,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Wheat,1042,Wheat,Percent Of Households Growing Wheat,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Crops,752,Yams,1043,Yams,Percent Of Households Growing Yams,Percentage,Crops_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Intensification,753,Area Farmed,1044,Mean_HH_Area_Farmed,Mean Household Area Farmed,Acres,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Area Owned,1045,Mean_Area_Owned,Mean Household Area Owned,,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Commercialization,1046,Avg_Pct_Crops_Any_Sold,Mean Percentage Of Crops Where Any Amount Was Sold,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Field Sizes,1047,median_field_size,Median Field Size,Acres,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Fungicides,1048,Fungicide_Rate,Percentage Of Fields Using Fungicides,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Herbicides,1049,Herbicide_Rate,Percentage Of Fields Using Herbicides,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Inorganic Fertilizer,1050,Pct_Fields_Inorg_Fert,Percentage Of Fields Using Inorganic Ferilizers,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Intercropping,1051,Intercrop_Rate,Percentage Of Fields Intercropped,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Irrigation,1052,Pct_Fields_Irrigated,Percentage Of Fields Irrigated,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Number Of Fields,1053,Mean_HH_Number_Fields,Mean Household Number Of Fields,,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Pesticides,1054,Pesticide_Rate,Percentage Of Fields Using Pesticides,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Intensification,753,Seed Purchasing,1055,Pct_Fields_Purchased_Seed,Percentage Of Fields Using Purchased Seeds,Percentage,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Agriculture,751,Production,754,Annual Crops,1056,AnnualCropProduction,Mean Household Annual Value Of Production Of Annual Crops,USD,AgValue_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Production,754,Crop Byproducts,1057,CropByproductProduction,Mean Household Annual Value Of Production Of Crop Byproducts,USD,AgValue_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Production,754,Livestock,1058,LivestockProduction,Mean Household Annual Value Of Production Of Livestock,USD,AgValue_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Production,754,Livestock Byproducts,1059,LivestockByproductProduction,Mean Household Annual Value Of Production Of Livestock Byproducts,USD,AgValue_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Production,754,Permanent Crops,1060,PermanentCropProduction,Mean Household Annual Value Of Production Of Permanent Crops,USD,AgValue_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Production,754,Total,1061,TotalAgriculturalProduction,Mean Household Annual Value Of Production Of All Agriculture,USD,AgValue_Landscape,#f8dfd8,#c04420,#850200
+Agriculture,751,Production,754,Yields Quartile,1062,Mean_Yield_Quantile,Mean Yield Quartle Across All Crops,,AgIntensification_Landscape,#e8f4dd,#669933,#055D00
+Food & Nutrition,755,Food Security,756,Dietary Diversity,1063,Mean_Diet_Diversity,Mean Household Diet Diversity Score,,FoodSecurity_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Food Security,756,Food As A Percentage Of Total Spending,1064,Food_As_Percent_Total_Spending,"Percentage Of All Expenditures On Food, Household Mean",Percentage,FoodSecurity_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Food Security,756,Food Consumption,1065,Mean_Food_Consumption_Value,Mean Household Annual Food Consumption Value,USD,FoodSecurity_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Food Security,756,Food Shortages,1066,Percent_Shortage_Past_Year,Percentage Of Households Reporting Food Shortages In The Past Year,Percentage,FoodSecurity_Landscape,#850200,#c04420,#f8dfd8
+Food & Nutrition,755,Food Security,756,Food Spending,1067,Mean_Food_Spending,Mean Household Annual Food Spending,USD,FoodSecurity_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Food Security,756,Nonfood Spending,1068,Mean_Nonfood_Spending,Mean Household Annual Nonfood Spending,USD,FoodSecurity_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Food Security,756,Number Of Meals,1069,avg_meals,Average Number Of Meals Per Day,,FoodSecurity_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Any Anthropometric Failutre,1070,percent_Composite_Index_Anthropometric_Failure,Percentage Of Children With Any Anthropometric Failure,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Overweight,1071,percent_overweight,Percentage Of Children Overweight,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Severe Stunting,1072,percent_severe_stunted,Percentage Of Children Severely Stunted,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Severe Underweight,1073,percent_severe_underweight,Percentage Of Children Severely Underwieght,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Severe Wasting,1074,percent_server_wasting,Percentage Of Children Severely Wasting,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Stunting,1075,percent_stunted,Percentage Of Children Stunted,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Underweight,1076,percent_underweight,Percentage Of Children Underweight,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Food & Nutrition,755,Nutrition,758,Wasting,1077,percent_wasting,Percentage Of Children Wasting,Percentage,Nutrition_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,Business Operation,1078,Male_Percent_Operated_Business,Percentage Of Men Who Operate A Business,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,Firewood Collection,1079,Male_Percent_Collects_Firewood,Percentage Of Men Who Collect Firewood,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,Firewood Collection Hours,1080,Male_Mean_Hours_Spent,Mean Hours Spent Collecting Fuelwood By Men,Hours,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,Headed Households,1081,Male_HH_Head,Percent Of Households Headed By Males,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,Hours Worked Last Week,1082,Male_Mean_Hours_Worked_Last_Week,Mean Hours Working In The Past Week By Men,Hours,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,Literacy Rate,1083,Male_Literacy_Rate,Percentage Of Men Who Can Read In Any Language,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,Recent Work,1084,Male_Percent_Worked_Recently,Percentage Of Men Who Have Worked In Past Week,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Men,749,School Attendance,1085,Male_Percent_Attended_School,Percentage Of Men Who Have Attended School,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,Business Operation,1086,Female_Percent_Operated_Business,Percentage Of Women Who Operate A Business,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,Firewood Collection,1087,Female_Percent_Collects_Firewood,Percentage Of Women Who Collect Firewood,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,Firewood Collection Hours,1088,Female_Mean_Hours_Spent,Mean Hours Spent Collecting Fuelwood By Women,Hours,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,Headed Households,1089,Female_HH_Head,Percent Of Households Headed By Females,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,Hours Worked Last Week,1090,Female_Mean_Hours_Worked_Last_Week,Mean Hours Working In The Past Week By Women,Hours,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,Literacy Rate,1091,Female_Literacy_Rate,Percentage Of Women Who Can Read In Any Language,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,Recent Work,1092,Female_Percent_Worked_Recently,Percentage Of Women Who Have Worked In Past Week,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Gender,748,Women,750,School Attendance,1093,Female_Percent_Attended_School,Percentage Of Women Who Have Attended School,Percentage,Gender_Landscape,#f8dfd8,#c04420,#850200
+Nature,746,Landcover,39,Agriculural Areas,1094,AG_Total,Percentage Of Land Area With Agricultural Cover,Percentage,LandCover_Landscape,#f8dfd8,#c04420,#850200
+Nature,746,Landcover,39,Natural Areas,1095,NR_Total,"Percentage Of Land Area With Natural Cover (Trees, Shrubs, Savanna)",Percentage,LandCover_Landscape,#e8f4dd,#669933,#055D00
+Nature,746,Natural Resource Use,747,Decreasing Fuelwood Availability,1096,Fuelwood_Decreasing,Percentage Of Households Reporting Decreasing Fuelwood Availability,Percentage,NaturalResources_Landscape,#f8dfd8,#c04420,#850200
+Nature,746,Natural Resource Use,747,Fuelwood From Natural Areas,1097,Fuelwood_From_Natural_Areas,Percentage Of Households Collecting Fuelwood From Natural Areas,Percentage,NaturalResources_Landscape,#e8f4dd,#669933,#055D00
+Nature,746,Natural Resource Use,747,Fuelwood Shortage,1098,Fuelwood_Shortage_Past_Year,Percentage Of Households Reporting Fuelwood Shortages In Past Year,Percentage,NaturalResources_Landscape,#f8dfd8,#c04420,#850200
+Nature,746,Natural Resource Use,747,Fuelwood Value,1099,Mean_Annual_Fuelwood_Value,Mean Household Annual Value Of Fuelwood Collected,USD,NaturalResources_Landscape,#e8f4dd,#669933,#055D00
+Nature,746,Natural Resource Use,747,Non-Fuelwood Natural Resource Value,1100,Nonfuel_NR_annual_value,Mean Household Annual Value Of Non-Fuelwood Gathered Resources,USD,NaturalResources_Landscape,#e8f4dd,#669933,#055D00
+Nature,746,Natural Resource Use,747,Non-Fuelwood Natural Resources Decreasing,1101,Nonfuel_NR_decreasing,Percentage Of Households Reporting Decreasing  Non-Fuelwood Gathered Resource Availability,Percentage,NaturalResources_Landscape,#f8dfd8,#c04420,#850200
+Nature,746,Natural Resource Use,747,Percent Collecting Non-Fuelwood Natural Resources,1102,Collects_Nonfuel_Resources,Percentage Of Households Collecting Non-Fuelwood Gathered Resources,Percentage,NaturalResources_Landscape,#e8f4dd,#669933,#055D00
+Poverty,759,Demographics,760,Age,1103,age,Average Age,,Capital_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Demographics,760,Household Size,1104,size,Average Number Of Individuals Per Household,,Capital_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Education,761,Literacy Rate,1105,literate,Percentage Of Individuals Who Can Read In Any Language,,Capital_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Education,761,Years Of Schooling,1106,years,Average Number Of Years Of Schooling Per Individual,,Capital_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Equality,762,Agricultural Production Inequality,1107,Production_Inequality_Gini,Gini Coefficient Of Agricultural Production,,AgValue_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Equality,762,Income Inequality,1108,Income_Inequality_Gini,Gini Coefficient Of Income Inequality,,Income_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Equality,762,Land Area Inequality,1109,Area_Owned_Ineq_Gini,Gini Coefficient Of Area Owned,,AgIntensification_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Income,763,Agricultural Costs,1110,AgCosts,Mean Household Annual Cost Of Agriculture,USD,Income_Landscape,#e8f4dd,#669933,#055D00
+Poverty,759,Income,763,Agricultural Income,1111,AgIncome,Mean Household Annual Income From Agriculture,USD,Income_Landscape,#e8f4dd,#669933,#055D00
+Poverty,759,Income,763,Gross Income,1112,TotalIncome,Mean Household Annual Gross Income From All Sources,USD,Income_Landscape,#e8f4dd,#669933,#055D00
+Poverty,759,Income,763,Non-Agricultural Income,1113,NonAgIncome,Mean Household Annual Income From Non-Agricultural Sources,USD,Income_Landscape,#e8f4dd,#669933,#055D00
+Poverty,759,Water and Sanitation,764,Flush Toilet,1114,Flush_Toilet,Percentage Of Households With A Flush Toilet,Percentage,WatSan_Landscape,#ebebff,#66CCFF,#000080
+Poverty,759,Water and Sanitation,764,Garbage Disposed Within Compound,1115,Dispose_Garbage_Within_Compound,Percentage Of Households That Dispose Of Garbage Within Their Compound,Percentage,WatSan_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Water and Sanitation,764,No Measure Of Ensuring Safe Drinking Water,1116,No_Measure_Safe_Drinking_Water,Percentage Of Households That Take No Measure Of Ensuring Safe Drinking Water,Percentage,WatSan_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Water and Sanitation,764,No Toilet,1117,No_Toilet,Percentage Of Households With No Toilet,Percentage,WatSan_Landscape,#f8dfd8,#c04420,#850200
+Poverty,759,Water and Sanitation,764,Pit Latrine,1118,Pit_Latrine,Percentage Of Households With A Pit Latrine,Percentage,WatSan_Landscape,#ebebff,#66CCFF,#000080
+Poverty,759,Water and Sanitation,764,Satisfied With Water Quality,1119,Satisfied_Drinking_Water,Percentage Of Households Satisfied With Their Drinking Water,Percentage,WatSan_Landscape,#ebebff,#66CCFF,#000080
+Poverty,759,Water and Sanitation,764,Unsatisfied With Water Quality,1120,Unsatisfied_Drinking_Water,Percentage Of Households Unsatisfied With Their Drinking Water,Percentage,WatSan_Landscape,#f8dfd8,#c04420,#850200
+Soils,680,Degradation,765,Area Degraded,1121,percent_degraded,Percent Of Land Area Degraded Since 2003,Percentage,LandCover_Landscape,#f8dfd8,#c04420,#850200
+Soils,680,Degradation,765,Area Improved,1122,percent_improved,Percent Of Land Area Improved Since 2003,Percentage,LandCover_Landscape,#e8f4dd,#669933,#055D00
+Soils,680,Degradation,765,Bad Soil,1123,Bad_Soil,Percent Of Households Reporting Bad Soil,Percentage,ErosionControl_Landscape,#f8dfd8,#c04420,#850200
+Soils,680,Degradation,765,Erosion Control,1124,erosion_control_household_percent,Percent Of Households Taking Erosion Control Measures,Percentage,ErosionControl_Landscape,#e8f4dd,#669933,#055D00
+Soils,680,Degradation,765,Good Soil,1125,Good_Soil,Percent Of Households Reporting Good Soil,Percentage,ErosionControl_Landscape,#e8f4dd,#669933,#055D00
