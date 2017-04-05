@@ -21,7 +21,26 @@ fs <- tbl(vs_db, 'flagging__household_secI') %>% data.frame
 
 fs$shortage_year <- fs$hh_i08=="1"
 
-fs <- fs %>% select(Country, Landscape.., Household.ID, Round, shortage_year, number_meals=hh_i031)
+
+# 2  Rely on less preferred foods? 
+# 2  Limit the variety of foods eaten? 
+# 5  Limit portion size at meal-times? 
+# 5  Reduce number of meals eaten in a day? 
+# 7  Restrict consumption by adults for small children to eat? 
+# 7  Borrow food, or rely on help from a friend or relative? 
+# 10  Have no food of any kind in your house-hold? 
+# 10  Go a whole day and night without eating anything?
+
+fs$CSI <-  rowSums(data.frame(fs$hh_i02_1 * 2, fs$hh_i02_2 * 2, 
+              fs$hh_i02_3 * 5, fs$hh_i02_4 * 5, 
+              fs$hh_i02_5 * 7, fs$hh_i02_6 * 7, 
+              fs$hh_i02_7 * 10, fs$hh_i02_8 * 10), na.rm=T)
+
+fs$months_insecurity <- rowSums(fs[ , c(paste0('hh_i09_2012_', seq(1,12)), paste0('hh_i09_2012_', seq(1,12)))], na.rm=T)
+
+
+
+fs <- fs %>% select(Country, Landscape.., Household.ID, Round, shortage_year, CSI, months_insecurity, number_meals=hh_i031)
 
 diet <- tbl(vs_db, 'flagging__household_secK2') %>% data.frame
 
@@ -94,6 +113,8 @@ out[ , rateadjust] <- out[ , rateadjust]/out$Rate
 out_ls <- out %>% group_by(Country, Landscape..) %>%
   summarize(avg_meals = mean(number_meals, na.rm=T),
             Percent_Shortage_Past_Year = mean(shortage_year, na.rm=T)*100,
+            Mean_Months_Insecurity = mean(months_insecurity, na.rm=T),
+            Mean_CSI = mean(CSI, na.rm=T),
             Mean_Diet_Diversity = mean(diversity, na.rm=T),
             Mean_Nonfood_Spending = mean(Nonfood.Spending, na.rm=T),
             Mean_Food_Consumption_Value = mean(Food.Consumption.Value, na.rm=T),
