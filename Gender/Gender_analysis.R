@@ -4,13 +4,13 @@ setwd('D://Documents and Settings/mcooper/GitHub/vs-indicators-calc/Combine/')
 
 hh <- read.csv('hh_level.csv')
 
-hh$Land <- paste0(hh$Country, '-', hh$Landscape..)
+hh$Land <- paste0(hh$country, '-', hh$landscape_no)
 hh <- hh %>% select(-Male.Gender, -Female.Gender)
 
 df <- data.frame()
 for(i in names(hh)[c(6:84,86:127)]){
   print(i)
-  mod <- aov(as.formula(paste0(i, '~HH.Head.Gender + Country + Land')), data=hh) %>% summary
+  mod <- aov(as.formula(paste0(i, '~HH.Head.Gender + country + Land')), data=hh) %>% summary
   
   df2 <- data.frame(Category = i,
                     Male_mean = mean(hh[hh$HH.Head.Gender=='Male' , i], na.rm=T),

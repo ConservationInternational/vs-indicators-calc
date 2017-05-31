@@ -9,19 +9,19 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-hh <- tbl(vs_db, 'flagging__agric') %>%
-  select(Country, `Household ID`, Round, `Landscape #`) %>%
+hh <- tbl(vs_db, 'c__agric') %>%
+  select(country, hh_refno, round, landscape_no) %>%
   data.frame
 
-crops <- tbl(vs_db, 'flagging__agric_field_roster') %>% 
-  select(`Household ID`, Round, Country, `Landscape #`, ag2a_vs_2d1, ag2a_vs_2b2_1) %>%
+crops <- tbl(vs_db, 'c__agric_field_roster') %>% 
+  select(hh_refno, round, country, landscape_no, ag2a_vs_2d1, ag2a_vs_2b2_1) %>%
   data.frame
 
 crops <- merge(hh, crops, all=T)
 
-crops <- melt(crops, id.vars=c('Household.ID', 'Round', 'Country', 'Landscape..'))
+crops <- melt(crops, id.vars=c('hh_refno', 'round', 'country', 'landscape_no'))
 
-sum_hh <- crops %>% group_by(Household.ID, Round, Country, Landscape..) %>%
+sum_hh <- crops %>% group_by(hh_refno, round, country, landscape_no) %>%
   summarize(Bananas = '71' %in% value | '71a' %in% value | '71b' %in% value | '71c' %in% value,
             Maize = "11" %in% value,
             Paddy = "12" %in% value,
@@ -59,7 +59,7 @@ sum_hh <- crops %>% group_by(Household.ID, Round, Country, Landscape..) %>%
             Okra = "100" %in% value,
             Timber = "304" %in% value) %>% data.frame
 
-sum <- sum_hh %>% group_by(Country, Landscape..) %>%
+sum <- sum_hh %>% group_by(country, landscape_no) %>%
   summarize(Bananas = mean(Bananas),
             Maize = mean(Maize),
             Paddy = mean(Paddy),

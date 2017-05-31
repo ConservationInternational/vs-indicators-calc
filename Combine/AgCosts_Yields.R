@@ -20,7 +20,7 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 #    ag4a_21 - What was the total value of seeds purchased?
 
 allvars <- tbl(con, 'flagging__agric_crops_by_field') %>%
-  select(Country, `Landscape #`,  `Crop name`, `Household ID`, `Field ID`, Season, Round,
+  select(Country, landscape_no,  crop_name, hh_refno, field_no, Season, Round,
          ag4a_15, ag4a_21, ag4a_08) %>%
   data.frame
 
@@ -34,7 +34,7 @@ allvars$Yield_PerArea <- allvars$ag4a_15/allvars$ag4a_08
 #    ag3a_22 What was the total value of organic fertilizer purchased?
 
 inc7 <- tbl(con, 'flagging__agric_field_details') %>%
-  select(Country, `Landscape #`, `Household ID`, `Field ID`, Season, Round, ag3a_32, ag3a_61, ag3a_22) %>%
+  select(Country, landscape_no, hh_refno, field_no, Season, Round, ag3a_32, ag3a_61, ag3a_22) %>%
   data.frame
 
 allvars <- merge(allvars, inc7, all.x=F, all.y=F)

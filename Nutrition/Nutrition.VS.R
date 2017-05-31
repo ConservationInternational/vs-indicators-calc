@@ -32,17 +32,17 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 # Read datasets and only keep variables for nutrition thread
-hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM flagging__household")) %>%
-  select(Country, Region, `Landscape #`, District, `Household ID`, Round, `Questionnaire inspection date`) %>%
+hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM c__household")) %>%
+  select(country, Region, landscape_no, District, hh_refno, round, `Questionnaire inspection date`) %>%
   data.frame
 
-hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secB"')) %>%
-  select(`Household ID`, Round, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
+hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "c__household_secB"')) %>%
+  select(hh_refno, round, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
   data.frame
 
-hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "flagging__household_secU"')) %>%
+hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "c__household_secU"')) %>%
   filter(flag=='') %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
-  select(`Household ID`, Round, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>%
+  select(hh_refno, round, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>%
   data.frame
 
 landscape <- tbl(vs_db, 'landscape') %>%
@@ -61,9 +61,9 @@ tsanthro <- read.table("WHO Anthro reference tables/tsanthro.txt", header=T)
 
 # Merge datasets into one "nutrition" dataset
 nutrition <- merge(hh_sec_a, hh_sec_b, 
-                   by = c("Household.ID", "Round"), all = TRUE)
+                   by = c("hh_refno", "round"), all = TRUE)
 nutrition <- merge(nutrition, hh_sec_u, 
-                   by = c("Household.ID", "Individual.ID", "Round"), all = TRUE)
+                   by = c("hh_refno", "Individual.ID", "round"), all = TRUE)
 
 # Household and individual ID
 # N23. Gender (M=1, F=2)
@@ -93,8 +93,8 @@ nutrition$measure[nutrition$measure == "STANDING"] <- "1"
 nutrition$measure[nutrition$measure == "LYING DOWN"] <- "2"
 
 # ISSUE32 need to add date of interview when it is added
-vars <- c("Country", "Region", "District", "Landscape..", "Round",
-          "Household.ID", "Individual.ID",  "intyr", "age", 
+vars <- c("country", "Region", "District", "landscape_no", "round",
+          "hh_refno", "Individual.ID",  "intyr", "age", 
           "weight", "lenhei", "armc", "measure", "sex")
 
 nutrition <- nutrition[ , vars]
@@ -136,7 +136,7 @@ matz$zwei[matz$fwei==1] <- NA
 matz$zwfl[matz$fwfl==1] <- NA
 matz <- matz[matz$age > 6, ]
 
-nutrition_df <- matz[,c('Country', 'Landscape..', 'Household.ID', 'Individual.ID', 'Round', 'zlen', 'zwei', 'zwfl')] 
+nutrition_df <- matz[,c('country', 'landscape_no', 'hh_refno', 'Individual.ID', 'round', 'zlen', 'zwei', 'zwfl')] 
 
 nutrition_df$stunting <- ifelse(nutrition_df$zlen < -2, 1, 0)
 nutrition_df$severe_stunting <- ifelse(nutrition_df$zlen < -3, 1, 0)
@@ -148,7 +148,7 @@ nutrition_df$overweight <- ifelse(nutrition_df$zwei > 1, 1, 0)
 
 nutrition_df$CIAF <- as.numeric(nutrition_df$stunting | nutrition_df$underweight | nutrition_df$wasting)
 
-nutrition_df$LandscapeCode <- paste(nutrition_df$Country, nutrition_df$Landscape.., sep='-')
+nutrition_df$LandscapeCode <- paste(nutrition_df$country, nutrition_df$landscape_no, sep='-')
 
 landscape$LandscapeCode <- paste(landscape$country, landscape$landscape_no, sep='-')
 landscape$latitude <- rowMeans(landscape[, c('lower_right_latitude', 'lower_left_latitude', 'upper_right_latitude', 'upper_left_latitude')], na.rm=T)
@@ -157,14 +157,14 @@ landscape$longitude <- rowMeans(landscape[, c('lower_right_longitude', 'lower_le
 nutrition_coords <- merge(nutrition_df, landscape[,c('LandscapeCode', 'latitude', 'longitude')], by='LandscapeCode', all.x=T)
 nutrition_coords$LandscapeCode <- NULL
 
-nutrition_landscape <- group_by(nutrition_coords, Country, Landscape..) %>% 
+nutrition_landscape <- group_by(nutrition_coords, country, landscape_no) %>% 
   summarise(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T),
             percent_stunted=mean(stunting, na.rm=T)*100, percent_severe_stunted=mean(severe_stunting, na.rm=T)*100,
             percent_underweight=mean(underweight, na.rm=T)*100, percent_severe_underweight=mean(severe_underweight, na.rm=T)*100,
             percent_wasting=mean(wasting, na.rm=T)*100, percent_server_wasting=mean(severe_wasting, na.rm=T)*100,
             percent_overweight=mean(overweight, na.rm=T)*100, percent_Composite_Index_Anthropometric_Failure=mean(CIAF, na.rm=T)*100)
 
-nut_hh <- nutrition_coords %>% group_by(Country, Landscape.., Household.ID, Round) %>% 
+nut_hh <- nutrition_coords %>% group_by(country, landscape_no, hh_refno, round) %>% 
   summarise(mean_zlen=mean(zlen, na.rm=T), mean_zwei=mean(zwei, na.rm=T), mean_zwfl=mean(zwfl, na.rm=T),
             percent_stunted=mean(stunting, na.rm=T)*100, percent_severe_stunted=mean(severe_stunting, na.rm=T)*100,
             percent_underweight=mean(underweight, na.rm=T)*100, percent_severe_underweight=mean(severe_underweight, na.rm=T)*100,

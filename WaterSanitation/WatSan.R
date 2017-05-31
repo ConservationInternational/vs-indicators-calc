@@ -8,8 +8,8 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-toilet <- tbl(vs_db, 'flagging__household_secJ1') %>%
-  select(Country, `Landscape #`, `Household ID`, Round, hh_j09, hh_j08, hh_j20, hh_j16_1) %>%
+toilet <- tbl(vs_db, 'c__household_secJ1') %>%
+  select(country, landscape_no, hh_refno, round, hh_j09, hh_j08, hh_j20, hh_j16_1) %>%
   data.frame
 
 toilet$No_Toilet <- toilet$hh_j09 == '1'
@@ -23,10 +23,10 @@ toilet$Dispose_Garbage_Within_Compound <- toilet$hh_j08 == '4'
 
 toilet$No_Measure_Safe_Drinking_Water <- toilet$hh_j16_1 == '7'
 
-toilet <- toilet %>% select(Country, Landscape.., Household.ID, Round, No_Toilet, Flush_Toilet, Pit_Latrine, Satisfied_Drinking_Water,
+toilet <- toilet %>% select(country, landscape_no, hh_refno, round, No_Toilet, Flush_Toilet, Pit_Latrine, Satisfied_Drinking_Water,
                             Unsatisfied_Drinking_Water, Dispose_Garbage_Within_Compound, No_Measure_Safe_Drinking_Water)
 
-toilet_sum <- toilet %>% group_by(Country, Landscape..) %>%
+toilet_sum <- toilet %>% group_by(country, landscape_no) %>%
   summarize(No_Toilet = mean(No_Toilet, na.rm=T),
             Flush_Toilet = mean(Flush_Toilet, na.rm=T),
             Pit_Latrine = mean(Pit_Latrine, na.rm=T),

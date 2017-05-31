@@ -8,12 +8,12 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-df <- tbl(vs_db, 'flagging__household_secC') %>%
-  select(Country, `Landscape #`, `Household ID`, Round, hh_c02, hh_c07, hh_c03, uuid) %>%
+df <- tbl(vs_db, 'c__household_secC') %>%
+  select(country, landscape_no, hh_refno, round, hh_c02, hh_c07, hh_c03, uuid) %>%
   data.frame
 
-age <- tbl(vs_db, 'flagging__household_secB') %>%
-  select(Country, `Landscape #`, `Household ID`, Round, hh_b04, uuid) %>%
+age <- tbl(vs_db, 'c__household_secB') %>%
+  select(country, landscape_no, hh_refno, round, hh_b04, uuid) %>%
   data.frame
 
 df <- merge(df, age, all=T)
@@ -23,18 +23,18 @@ years <- read.csv('YearsOfSchooling.csv')
 df$school_code <- as.numeric(df$hh_c07)
 df$literate <- df$hh_c02 != '5'
 
-ed <- merge(df, years, by=c('Country', 'school_code'), all.x=T)
+ed <- merge(df, years, by=c('country', 'school_code'), all.x=T)
 ed$years[ed$hh_c03=='2'] <- 0
 
-hh_size <- ed %>% group_by(Country, Landscape.., Household.ID, Round) %>%
+hh_size <- ed %>% group_by(country, landscape_no, hh_refno, round) %>%
   summarize(size=n())
 
-capital <- ed %>% group_by(Country, Landscape.., Household.ID, Round) %>%
+capital <- ed %>% group_by(country, landscape_no, hh_refno, round) %>%
   summarize(literate=mean(literate, na.rm=T), years=mean(years, na.rm=T), age=mean(hh_b04))
 
 household_capital <- merge(hh_size, capital)
 
-hc <- household_capital %>% group_by(Country, Landscape..) %>%
+hc <- household_capital %>% group_by(country, landscape_no) %>%
   summarize(size=mean(size, na.rm=T),
             literate = mean(literate, na.rm=T),
             years = mean(years, na.rm=T),

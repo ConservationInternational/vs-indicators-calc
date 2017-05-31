@@ -10,16 +10,16 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 #accumulator
-allvars <- tbl(con, "flagging__agric") %>%
-  select(survey_uuid, Country, `Landscape #`, `Household ID`, Round) %>%
+allvars <- tbl(con, "c__agric") %>%
+  select(survey_uuid, country, landscape_no, hh_refno, round) %>%
   data.frame %>%
-  select(survey_uuid, Country, Landscape.., Household.ID, Round)
+  select(survey_uuid, country, landscape_no, hh_refno, round)
 
 
 # Field Size - agric_field_roster
 #   ag2a_09 - GPS MEASUREMENT ((what is the area of the field taken by GPS tracking (Acres)?)
 
-field_size <- tbl(con, "flagging__agric_field_roster") %>%
+field_size <- tbl(con, "c__agric_field_roster") %>%
   select(survey_uuid, ag2a_09, flag) %>%
   data.frame %>%
   group_by(survey_uuid) %>%
@@ -31,7 +31,7 @@ allvars <- merge(allvars, field_size, all.x=T)
 # Intercropping  - agric_crops_by_field
 #   ag4a_04 - Was cultivation intercropped? {1: 'Yes', 2: 'No'}
 
-intercropping <- tbl(con, "flagging__agric_crops_by_field") %>%
+intercropping <- tbl(con, "c__agric_crops_by_field") %>%
   select(survey_uuid, ag4a_04, flag) %>%
   data.frame
 
@@ -56,7 +56,7 @@ allvars <- merge(allvars, intercropping, all.x=T)
 #   fd35_24a_npk
 #   fd35_24a_mrp
 
-inputs <- tbl(con, "flagging__agric_field_details") %>%
+inputs <- tbl(con, "c__agric_field_details") %>%
   select(survey_uuid, ag3a_34, ag3a_33,
          fd35_24a_dap, fd35_24a_urea, fd35_24a_tsp,
          fd35_24a_can, fd35_24a_sa, fd35_24a_npk, fd35_24a_mrp, flag) %>%
@@ -108,14 +108,14 @@ allvars <- merge(allvars, inputs, all.x=T)
 #   ag4a_08 - Area (Acres) Farmers estimate
 #   ag4a_15 - Amount
 #   ag4a_15_unit - Unit  {1: 'Kg', 2: 'Liter', 3: 'Milliliter'}
-yields <- tbl(con, "flagging__agric_crops_by_field") %>%
+yields <- tbl(con, "c__agric_crops_by_field") %>%
   filter(!is.na(ag4a_15) & !is.na(ag4a_08) & ag4a_08 > 0) %>%
-  select(survey_uuid, Country, `Crop name`, ag4a_08, ag4a_15, ag4a_15_unit, flag) %>%
+  select(survey_uuid, country, crop_name, ag4a_08, ag4a_15, ag4a_15_unit, flag) %>%
   data.frame
 
 yields$yield <- yields$ag4a_15/yields$ag4a_08
 
-yields$cs <- paste0(yields$Crop.name, yields$ag4a_15_unit, yields$Country)
+yields$cs <- paste0(yields$Crop.name, yields$ag4a_15_unit, yields$country)
 
 for (c in unique(yields$cs)){
   sel <- yields$yield[yields$cs==c]
@@ -139,17 +139,17 @@ allvars <- merge(allvars, yields, all.x=T)
 #   ag5a_01 - Did you sell any of the ${fd5_crop_name} produced
 #   ag5a_02_1 - Amount
 #   ag5a_02_2 - Unit {1: 'Kg', 2: 'Liter', 3: 'Milliliter'}
-sold <- tbl(con, "flagging__agric_crops_by_hh") %>%
-  select(survey_uuid, `Crop name`, Season, ag5a_01, ag5a_02_1, ag5a_02_2, flag) %>%
+sold <- tbl(con, "c__agric_crops_by_hh") %>%
+  select(survey_uuid, crop_name, Season, ag5a_01, ag5a_02_1, ag5a_02_2, flag) %>%
   data.frame
 
 #   ag4a_08 - Area (Acres) Farmers estimate
 #   ag4a_15 - Amount
 #   ag4a_15_unit - Unit  {1: 'Kg', 2: 'Liter', 3: 'Milliliter'}
 
-# yields <- tbl(con, "flagging__agric_crops_by_field") %>%
+# yields <- tbl(con, "c__agric_crops_by_field") %>%
 #   filter(!is.na(ag4a_08) & !is.na(ag4a_15) & ag4a_08 > 0) %>%
-#   select(survey_uuid, `Crop name`, Season, ag4a_08, ag4a_15, ag4a_15_unit, flag) %>%
+#   select(survey_uuid, crop_name, Season, ag4a_08, ag4a_15, ag4a_15_unit, flag) %>%
 #   data.frame %>%
 #   group_by(survey_uuid, Crop.name, ag4a_15_unit) %>%
 #   summarize(ag4a_15=sum(ag4a_15, na.rm=T))
@@ -175,7 +175,7 @@ allvars <- merge(allvars, sold, all.x=T)
 # Irrigaion
 #   ag3a_09 - Was this FIELD irrigated in the last completed
 
-irrig <- tbl(con, 'flagging__agric_field_details') %>% 
+irrig <- tbl(con, 'c__agric_field_details') %>% 
   select(survey_uuid, flag, ag3a_09) %>%
   data.frame
 
@@ -190,7 +190,7 @@ allvars <- merge(allvars, irrig, all.x=T)
 ############################
 # Inorganic Fertilizers
 
-inorg <- tbl(con, 'flagging__agric_field_details') %>% 
+inorg <- tbl(con, 'c__agric_field_details') %>% 
   select(survey_uuid, flag, ag3a_23) %>%
   data.frame
 
@@ -208,7 +208,7 @@ allvars <- merge(allvars, inorg, all.x=T)
 # agric_crops_by_field
 #   ag4a_19 - Did you purchase any SEED for ${fd4_crop_name} in the last completed Long Rainy Season / Major Cropping Season?
 #   ag4a_21 - What type of seed did you purchase ?  {1: 'Traditional', 2: 'Purchased Improved Seeds', 3: 'Saved Improved Seeds'}
-seed <- tbl(con, 'flagging__agric_crops_by_field') %>%
+seed <- tbl(con, 'c__agric_crops_by_field') %>%
   select(survey_uuid, flag, ag4a_19, ag4a_21) %>%
   data.frame
 
@@ -221,7 +221,7 @@ allvars <- merge(allvars, seed, all.x=T)
 
 ################################
 #Average number of fields farmed in either season or both
-numfields <- tbl(con, 'flagging__agric_field_roster') %>%
+numfields <- tbl(con, 'c__agric_field_roster') %>%
   group_by(survey_uuid) %>% summarize(number_fields=n()) %>%
   data.frame
 
@@ -230,12 +230,12 @@ allvars <- merge(allvars, numfields, all.x=T)
 ################################
 #Total Area Owned
 
-ownership <- tbl(con, 'flagging__agric_field_details') %>%
+ownership <- tbl(con, 'c__agric_field_details') %>%
   filter(ag3a_14=='1') %>%
-  select(survey_uuid, `Field ID`) %>% data.frame
+  select(survey_uuid, field_no) %>% data.frame
 
-fieldsize <- tbl(con, 'flagging__agric_field_roster') %>%
-  select(survey_uuid, `Field ID`, ag2a_09) %>% 
+fieldsize <- tbl(con, 'c__agric_field_roster') %>%
+  select(survey_uuid, field_no, ag2a_09) %>% 
   data.frame
 
 combo <- merge(ownership, fieldsize)
@@ -246,7 +246,7 @@ hh_total <- combo %>% group_by(survey_uuid) %>%
 
 allvars <- merge(allvars, hh_total, all.x=T)
 
-allsum <- allvars %>% group_by(Country, Landscape..) %>%
+allsum <- allvars %>% group_by(country, landscape_no) %>%
   summarize(median_field_size=median(median_field_size, na.rm=T), 
             Mean_HH_Area_Farmed=mean(Total_Area_Farmed, na.rm=T),
             Intercrop_Rate=mean(intercrop_rate, na.rm=T), 

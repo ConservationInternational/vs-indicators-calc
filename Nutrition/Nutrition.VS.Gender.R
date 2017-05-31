@@ -35,15 +35,15 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 
 # Read datasets and only keep variables for nutrition thread
 hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM curation__household")) %>%
-  select(Country, Region, `Landscape #`, District, `Household ID`, `Data entry date`) %>%
+  select(country, Region, landscape_no, District, hh_refno, `Data entry date`) %>%
   data.frame
 
 hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secB"')) %>%
-  select(`Household ID`, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
+  select(hh_refno, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
   data.frame
 
 hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "curation__household_secU"')) %>%
-  select(`Household ID`, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
+  select(hh_refno, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
   data.frame
 
 # Restore reference data sets
@@ -59,9 +59,9 @@ tsanthro <- read.table("WHO Anthro reference tables/tsanthro.txt", header=T)
 
 # Merge datasets into one "nutrition" dataset
 nutrition <- merge(hh_sec_a, hh_sec_b, 
-                   by = "Household.ID", all = TRUE)
+                   by = "hh_refno", all = TRUE)
 nutrition <- merge(nutrition, hh_sec_u, 
-                   by = c("Household.ID", "Individual.ID"), all = TRUE)
+                   by = c("hh_refno", "Individual.ID"), all = TRUE)
 
 # Household and individual ID
 # N23. Gender (M=1, F=2)
@@ -91,8 +91,8 @@ nutrition$measure[nutrition$measure == "STANDING"] <- "1"
 nutrition$measure[nutrition$measure == "LYING DOWN"] <- "2"
 
 # ISSUE32 need to add date of interview when it is added
-vars <- c("Country", "Region", "District", "Landscape..", 
-          "Household.ID", "Individual.ID",  "intyr", "age", 
+vars <- c("country", "Region", "District", "landscape_no", 
+          "hh_refno", "Individual.ID",  "intyr", "age", 
           "weight", "lenhei", "armc", "measure", "sex")
 
 nutrition <- nutrition[ , vars]
@@ -134,7 +134,7 @@ matz$zwei[matz$fwei==1] <- NA
 matz$zwfl[matz$fwfl==1] <- NA
 matz <- matz[matz$age > 6, ]
 
-nutrition_df <- matz[,c('Country', 'Landscape..', 'Household.ID', 'Individual.ID', 'zlen', 'zwei', 'zwfl', 'sex')] 
+nutrition_df <- matz[,c('country', 'landscape_no', 'hh_refno', 'Individual.ID', 'zlen', 'zwei', 'zwfl', 'sex')] 
 
 nutrition_df$stunting <- ifelse(nutrition_df$zlen < -2, 1, 0)
 nutrition_df$severe_stunting <- ifelse(nutrition_df$zlen < -3, 1, 0)
@@ -146,10 +146,10 @@ nutrition_df$overweight <- ifelse(nutrition_df$zwei > 1, 1, 0)
 
 nutrition_df$CIAF <- as.numeric(nutrition_df$stunting | nutrition_df$underweight | nutrition_df$wasting)
 
-nutrition_df$LandscapeCode <- paste(nutrition_df$Country, nutrition_df$Landscape.., sep='-')
+nutrition_df$LandscapeCode <- paste(nutrition_df$country, nutrition_df$landscape_no, sep='-')
 
 nutrition_gender_country <- nutrition_df %>% 
-  group_by(Country, sex) %>%
+  group_by(country, sex) %>%
   summarize(CIAF=mean(CIAF, na.rm=T), zwei=mean(zwei, na.rm=T), zlen=mean(zlen, na.rm=T), zwfl=mean(zwfl, na.rm=T))
 
 nutrition_gender_landscape <- nutrition_df %>% 
@@ -157,6 +157,6 @@ nutrition_gender_landscape <- nutrition_df %>%
   summarize(mean=mean(CIAF, na.rm=T))
 
 #A childs gender has no statistically significant effect on their nutrition status
-mod <- lmer(CIAF~(1|Country)+(sex|LandscapeCode)+sex, data=nutrition_df)
+mod <- lmer(CIAF~(1|country)+(sex|LandscapeCode)+sex, data=nutrition_df)
 summary(mod)
 

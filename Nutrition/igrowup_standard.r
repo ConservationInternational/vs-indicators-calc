@@ -77,7 +77,7 @@ wsd <- function(x,w) {
 
 
 ######################################################################################
-#### Rounding function - SPlus rounding function uses the nearest even number rule
+#### rounding function - SPlus rounding function uses the nearest even number rule
 ######################################################################################
 
 rounde <- function(x,digits=0) {
@@ -499,7 +499,7 @@ mat<-calc.zwfl(mat,wflanthro,wfhanthro)
 
 mat<-calc.zbmi(mat,bmianthro)
 
-#### Rounding the z-scores to two decimals
+#### rounding the z-scores to two decimals
 
 			mat$zlen<-rounde(mat$zlen,digits=2)
 			mat$zwei<-rounde(mat$zwei,digits=2)

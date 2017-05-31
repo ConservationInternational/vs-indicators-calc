@@ -17,7 +17,7 @@ crop <- read('Crops_Landscape.csv')
 degr_eros <- read('ErosionControl_Landscape.csv')
 degr <- read.csv('../LandCover/VS_landscapes_degradation_PRELIMINARY.CSV') %>%
   filter(time_period == '2003-2015' & ISO != 'KEN') %>%
-  select(Country = ISO, Landscape..=Landscape, perc_degraded=degraded_area_km, perc_improved=improved_area_km)
+  select(country = ISO, landscape_no=Landscape, perc_degraded=degraded_area_km, perc_improved=improved_area_km)
 gend <- read('Gender_Landscape.csv')
 hh_econ <- read('Income_Landscape.csv')
 h_cap <- read('Capital_Landscape.csv')
@@ -26,7 +26,7 @@ nut <- read('Nutrition_Landscape.csv') %>%
   select(-mean_zwei, -mean_zlen, -mean_zwfl)
 ws <- read('WatSan_Landscape.csv')
 lc <- read('LandCover_Landscape.csv') %>%
-  select(Landscape.., Country, NR_Total, AG_Total)
+  select(landscape_no, country, NR_Total, AG_Total)
 
 ls <- Reduce(function(x, y){merge(x, y, all=T)}, list(fs, ag_intens, ag_value, crop, degr_eros, degr, 
                          gend, hh_econ, h_cap, nr, nut, ws, lc))

@@ -50,7 +50,7 @@ bootstrap_diversity <- function(vector, freq, iter){
 ####################
 
 #The area of the plots are not the same, so we have to somehow adjust that.  Restrict to smallest plot size?
-eplot <- tbl(con, 'flagging__eplot') %>% select(survey_uuid, Country, latitude, longitude, `Subplot Radius`, flag) %>% data.frame %>%
+eplot <- tbl(con, 'c__eplot') %>% select(survey_uuid, country, latitude, longitude, `Subplot Radius`, flag) %>% data.frame %>%
   filter(!grepl('Subplot Radius', flag) & !is.na(Subplot.Radius))
 
 radii <- unique(eplot$Subplot.Radius)
@@ -61,33 +61,33 @@ subplot <- data.frame(Subplot.Radius=radii, area, ratio)
 
 eplot <- merge(eplot, subplot)
 
-species <- tbl(con, 'flagging__eplot_woody_plant') %>% select(survey_uuid, Country, Genus, Species) %>% data.frame
+species <- tbl(con, 'c__eplot_woody_plant') %>% select(survey_uuid, country, Genus, Species) %>% data.frame
 
 species <- merge(eplot, species)
 
 species <- species %>% filter(Genus != 'Musa')
 
-species_sum <- species %>% group_by(survey_uuid, latitude, longitude, Country) %>% 
+species_sum <- species %>% group_by(survey_uuid, latitude, longitude, country) %>% 
   summarize(biodiversity=bootstrap_diversity(vector=paste0(Genus, Species), freq=ratio, iter=500))
 
 ######################
 #Tree Cover
 ######################
 
-treecov <- tbl(con, 'flagging__eplot_subplot_woody_canopy') %>%
-  select(survey_uuid, Country, latitude, longitude, 
+treecov <- tbl(con, 'c__eplot_subplot_woody_canopy') %>%
+  select(survey_uuid, country, latitude, longitude, 
          `Densiometer N`, `Densiometer S`, `Densiometer E`, `Densiometer W`) %>%
   data.frame %>%
-  group_by(survey_uuid, Country, latitude, longitude) %>%
+  group_by(survey_uuid, country, latitude, longitude) %>%
   summarize(Canopy = (mean((Densiometer.N + Densiometer.S + Densiometer.E + Densiometer.W)/4)))
 
 ######################
 #LandscapeFN
 ######################
 
-landscapefn <- tbl(con, 'flagging__eplot_subplot_landscapefn') %>%
+landscapefn <- tbl(con, 'c__eplot_subplot_landscapefn') %>%
   data.frame %>%
-  group_by(survey_uuid, Country, latitude, longitude) %>%
+  group_by(survey_uuid, country, latitude, longitude) %>%
   summarize(Rooted.Plants = mean(Rooted.Plants, na.rm=T),
             Litter.Cover = mean(Litter.Cover, na.rm=T),
             Downed.Wood = mean(Downed.Wood, na.rm=T),
@@ -107,9 +107,9 @@ landscapefn <- tbl(con, 'flagging__eplot_subplot_landscapefn') %>%
 #####################
 
 soils <- tbl(con, 'eplotsoils_processed') %>%
-  select(Country=country, Landscape..=landscape_no, Eplot..=eplot_no, total_carbon, 
+  select(country=country, landscape_no=landscape_no, Eplot..=eplot_no, total_carbon, 
          total_nitrogen, ph, k, p) %>% data.frame %>%
-  group_by(Country, Landscape.., Eplot..) %>%
+  group_by(country, landscape_no, Eplot..) %>%
   summarize(C=mean(total_carbon, na.rm=T),
             N=mean(total_nitrogen, na.rm=T),
             P=mean(p, na.rm=T),
@@ -120,18 +120,18 @@ soils <- tbl(con, 'eplotsoils_processed') %>%
 #All Together
 ###################
 
-eplot <- tbl(con, 'flagging__eplot') %>% 
-  select(latitude, longitude, Country, survey_uuid, `Landscape #`, `Eplot #`, flag) %>%
+eplot <- tbl(con, 'c__eplot') %>% 
+  select(latitude, longitude, country, survey_uuid, landscape_no, `Eplot #`, flag) %>%
   data.frame %>%
   filter(!grepl("GPS NEpoint not within landscape boundary", flag))
 
-eplot <- merge(eplot, species_sum, by=c('latitude', 'longitude', 'Country', 'survey_uuid'), all.x=T, all.y=F)
+eplot <- merge(eplot, species_sum, by=c('latitude', 'longitude', 'country', 'survey_uuid'), all.x=T, all.y=F)
 
-eplot <- merge(eplot, treecov, by=c('latitude', 'longitude', 'Country', 'survey_uuid'), all.x=T, all.y=F)
+eplot <- merge(eplot, treecov, by=c('latitude', 'longitude', 'country', 'survey_uuid'), all.x=T, all.y=F)
 
-eplot <- merge(eplot, landscapefn, by=c('latitude', 'longitude', 'Country', 'survey_uuid'), all.x=T, all.y=F)
+eplot <- merge(eplot, landscapefn, by=c('latitude', 'longitude', 'country', 'survey_uuid'), all.x=T, all.y=F)
 
-eplot <- merge(eplot, soils, by=c('Country', 'Landscape..', 'Eplot..'), all.x=T, all.y=F)
+eplot <- merge(eplot, soils, by=c('country', 'landscape_no', 'Eplot..'), all.x=T, all.y=F)
 
 #########################################
 #Write

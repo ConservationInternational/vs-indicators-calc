@@ -12,9 +12,9 @@ library(reshape2)
 library(ggplot2)
 
 nutrition_indid <- read.csv('Nutrition.Individual.csv') %>% 
-  select(Country, Landscape.., Individual.ID, zlen, zwei, zwfl) %>% 
-  rename(Landscape=Landscape.., Height=zlen, Weight=zwei, Height.by.Weight=zwfl) %>%
-  melt(id.vars=c('Country', 'Landscape', 'Individual.ID')) %>%
+  select(country, landscape_no, Individual.ID, zlen, zwei, zwfl) %>% 
+  rename(Landscape=landscape_no, Height=zlen, Weight=zwei, Height.by.Weight=zwfl) %>%
+  melt(id.vars=c('country', 'Landscape', 'Individual.ID')) %>%
   na.omit
 
 nutrition_landscape <- read.csv('Nutrition.Landscape.csv')
@@ -33,7 +33,7 @@ nutrition_landscape$color <- rbPal(10)[as.numeric(cut(nutrition_landscape$percen
 ##Tanzania
 ```{r, echo=FALSE, warning=FALSE}
 
-ggplot(nutrition_indid[nutrition_indid$Country=='TZA',], aes(value, fill = Landscape)) +
+ggplot(nutrition_indid[nutrition_indid$country=='TZA',], aes(value, fill = Landscape)) +
   geom_density(alpha = 0.2) + 
   ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
   geom_vline(data = failure, aes(xintercept = val, colour=Cutoff)) +
@@ -43,16 +43,16 @@ ggplot(nutrition_indid[nutrition_indid$Country=='TZA',], aes(value, fill = Lands
 
 
 map('worldHires', 'Tanzania') 
-sel <- nutrition_landscape[nutrition_landscape$Country=='TZA' , ]
+sel <- nutrition_landscape[nutrition_landscape$country=='TZA' , ]
 title('Percentage of children with any Anthropometric Failure')
 points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
-textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.5)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape_no, '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.5)
 ```
 
 ##Ghana
 ```{r, echo=FALSE, warning=FALSE}
 
-ggplot(nutrition_indid[nutrition_indid$Country=='GHA', ], aes(value, fill = Landscape)) +
+ggplot(nutrition_indid[nutrition_indid$country=='GHA', ], aes(value, fill = Landscape)) +
   geom_density(alpha = 0.2) + 
   ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
   geom_vline(aes(xintercept = -2, colour='Failure')) + 
@@ -63,16 +63,16 @@ ggplot(nutrition_indid[nutrition_indid$Country=='GHA', ], aes(value, fill = Land
 
 
 map('worldHires', 'Ghana') 
-sel <- nutrition_landscape[nutrition_landscape$Country=='GHA' , ]
+sel <- nutrition_landscape[nutrition_landscape$country=='GHA' , ]
 title('Percentage of children with any Anthropometric Failure')
 points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
-textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape_no, '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
 ```
 
 ##Uganda
 ```{r, echo=FALSE, warning=FALSE}
 
-ggplot(nutrition_indid[nutrition_indid$Country=='UGA', ], aes(value, fill = Landscape)) +
+ggplot(nutrition_indid[nutrition_indid$country=='UGA', ], aes(value, fill = Landscape)) +
   geom_density(alpha = 0.2) + 
   ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
   geom_vline(aes(xintercept = -2, colour='Failure')) + 
@@ -83,17 +83,17 @@ ggplot(nutrition_indid[nutrition_indid$Country=='UGA', ], aes(value, fill = Land
 
 
 map('worldHires', 'Uganda') 
-sel <- nutrition_landscape[nutrition_landscape$Country=='UGA' , ]
+sel <- nutrition_landscape[nutrition_landscape$country=='UGA' , ]
 title('Percentage of children with any Anthropometric Failure')
 points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
-textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape_no, '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
 ```
 
 
 ##Rwanda
 ```{r, echo=FALSE, warning=FALSE}
 
-ggplot(nutrition_indid[nutrition_indid$Country=='RWA', ], aes(value, fill = Landscape)) +
+ggplot(nutrition_indid[nutrition_indid$country=='RWA', ], aes(value, fill = Landscape)) +
   geom_density(alpha = 0.2) + 
   ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
   geom_vline(aes(xintercept = -2, colour='Failure')) + 
@@ -104,8 +104,8 @@ ggplot(nutrition_indid[nutrition_indid$Country=='RWA', ], aes(value, fill = Land
 
 
 map('worldHires', 'Rwanda') 
-sel <- nutrition_landscape[nutrition_landscape$Country=='RWA' , ]
+sel <- nutrition_landscape[nutrition_landscape$country=='RWA' , ]
 title('Percentage of children with any Anthropometric Failure')
 points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
-textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape_no, '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
 ```

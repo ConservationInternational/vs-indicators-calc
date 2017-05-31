@@ -34,7 +34,7 @@ nut$no_any[(nut$no_stunting==1 | nut$no_underweight==1 | nut$no_wasting) & nut$a
 generateIndividuals <- function(c, l, v, nut){
   cols <- c('Individual.ID', names(nut)[grepl(v, names(nut))])
   
-  sel <- nut %>% filter(Country==c, Landscape..==l) %>%
+  sel <- nut %>% filter(country==c, landscape_no==l) %>%
     select_(.dots=cols) %>%
     melt(id.vars=c('Individual.ID')) %>%
     filter(value==1)
@@ -92,7 +92,7 @@ generateMaps <- function(c, nut){
 
 png(paste0('nutrition_', c, '.png'), width = 6000, height = 6000)
 
-sel <- unique(nut[nut$Country==c, c('Landscape..', 'latitude', 'longitude')])
+sel <- unique(nut[nut$country==c, c('landscape_no', 'latitude', 'longitude')])
 
 cty <- switch(c, "UGA"=map('worldHires', "Uganda", fill=T, col='#ccbbab'), 
                  "TZA"=map('worldHires', "Tanzania", ylim=c(-11.8504064, -6), fill=T, col='#ccbbab'), 
@@ -109,7 +109,7 @@ if (c == 'TZA'){
 }
 
 for (i in 1:nrow(sel)){
-  img <- readPNG(paste0(c, '-', sel$Landscape..[i], ".png"))
+  img <- readPNG(paste0(c, '-', sel$landscape_no[i], ".png"))
   rasterImage(img, xleft=sel$longitude[i]-len, ybottom=sel$latitude[i]-len, xright=sel$longitude[i]+len, ytop=sel$latitude[i]+len)
 }
 
@@ -125,8 +125,8 @@ rasterImage(leg, xleft=pr[2]-len*3, xright=pr[2], ybottom=pr[3], ytop=pr[3]+len*
 dev.off()
 }
 
-for (c in unique(nut$Country)){
-  ls <- unique(nut[nut$Country==c, 'Landscape..'])
+for (c in unique(nut$country)){
+  ls <- unique(nut[nut$country==c, 'landscape_no'])
   for (l in ls){
     for (v in c('stunting', 'wasting', 'underweight', 'any')){
       generateIndividuals(c, l, v, nut)
@@ -135,6 +135,6 @@ for (c in unique(nut$Country)){
   }
 }
 
-for (c in unique(nut$Country)){
+for (c in unique(nut$country)){
   generateMaps(c, nut)
 }

@@ -3,11 +3,11 @@ library(dplyr)
 setwd('D://Documents and Settings/mcooper/GitHub/vs-indicators-calc/LandCover/')
 
 LandCover <- read.csv('LandCover_2010.csv') %>%
-  select(Country, Landscape=Landscape.., NR_Total, AG_Total)
+  select(country, Landscape=landscape_no, NR_Total, AG_Total)
 
 Deg <- read.csv('VS_landscapes_degradation_PRELIMINARY.CSV') %>%
   filter(time_period=='2003-2015' & ISO != 'KEN') %>%
-  select(Country=ISO, Landscape, percent_degraded=degraded_area_km, percent_improved=improved_area_km)
+  select(country=ISO, Landscape, percent_degraded=degraded_area_km, percent_improved=improved_area_km)
 
 final <- merge(Deg, LandCover)
 
