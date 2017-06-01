@@ -1,7 +1,7 @@
 library(dplyr)
 library(reshape2)
 
-setwd('D://Documents and Settings/mcooper/GitHub/vs-indicators-calc/NaturalResources/')
+setwd('./NaturalResources/')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
@@ -13,9 +13,73 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 #Get NR Value
 ######################################
 
-hh <- tbl(con, 'c__household') %>%
+allvars <- tbl(con, 'c__household') %>%
   select(country, landscape_no, hh_refno, round) %>% 
-  data.frame %>% unique
+  collect
+
+resource <- tbl(con, 'c__household_resource') %>%
+  collect
+
+foods <- c('Wild meat', 'Wild insects', 'Fish from local rivers/creeks', 'Nuts or seeds',
+           'Honey', 'Other - Snail', 'Other - Crabs', "Other - Crabs, snails and mushrooms", 
+           "Other - Crabs,  snails and mushrooms", "Other - MUSHROOMS", 
+           "Other - Mushrooms", "Other - Vegetables", "Other - Green vegetables", 
+           "Other - Mushroom")
+nonfoods <- c("Building materials (e.g. wood that is not used as a fuel source) ", 
+              "Medicinal Plants", "Items for special ceremonies",
+              "Other - Palms for making mats", "Other - Palms for weaving mats", 
+              "Other - Sisal", "Other - Grass")
+
+resource$food[resource$resource %in% foods] <- resource$hh_hv2_10[resource$resource %in% foods]
+resource$nonfood[resource$resource %in% nonfoods] <- resource$hh_hv2_10[resource$resource %in% nonfoods]
+
+resource$declined <- resource$hh_hv2_15 == 'Declined'
+
+resource$multiplier[resource$hh_hv2_12 == "Annually"] <- 1
+resource$multiplier[resource$hh_hv2_12 == "Monthly"] <- 12
+resource$multiplier[resource$hh_hv2_12 == "Weekly"] <- 52
+resource$multiplier[resource$hh_hv2_12 == "Seasonally"] <- 3
+
+resource$nr_value <- resource$hh_hv2_14 * resource$multiplier
+
+resource <- resource %>%
+  group_by(hh_refno, round) %>%
+  summarize(declined = mean(declined, na.rm=T),
+            nr_value = sum(nr_value, na.rm=T),
+            food = any(food),
+            nonfood = any(nonfood))
+
+resource[ c('food', 'nonfood')][is.na(resource[ c('food', 'nonfood')])] <- FALSE
+resource$declined[is.nan(resource$declined)] <- NA
+
+allvars <- left_join(allvars, resource)
+
+
+#bundles	cost	total_fuelwood_value	hh_annual_nonfuel_nr_value	Nonfuel_NR_decreasing
+
+
+# hv2_14_01 - Wild meat
+# hv2_14_02 - Wild insects
+# hv2_14_03 - Fish from local rivers/creeks
+# hv2_14_04 - Nuts or seeds
+# hv2_14_05 - Building materials (e.g. wood that is not used as a fuel source) 
+# hv2_14_06 - Medicinal Plants
+# hv2_14_07 - Items for special ceremonies
+# hv2_14_08 - Honey
+# hv2_14_09 - Other
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #Fuelwood Value
 hv1.1 <- tbl(con, 'c__household_secHV1') %>%
@@ -55,15 +119,7 @@ hv2.1.1 <- hv2.1 %>% group_by(country, landscape_no) %>%
   data.frame
 
 #Natural Resource Value
-# hv2_14_01 - Wild meat
-# hv2_14_02 - Wild insects
-# hv2_14_03 - Fish from local rivers/creeks
-# hv2_14_04 - Nuts or seeds
-# hv2_14_05 - Building materials (e.g. wood that is not used as a fuel source) 
-# hv2_14_06 - Medicinal Plants
-# hv2_14_07 - Items for special ceremonies
-# hv2_14_08 - Honey
-# hv2_14_09 - Other
+
 
 #Nonfuel expenditures
 hv2.2.1 <- tbl(con, 'c__household_secHV2') %>% 
