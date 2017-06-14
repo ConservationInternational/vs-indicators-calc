@@ -1,7 +1,7 @@
 library(dplyr)
 library(reshape2)
 
-setwd('./NaturalResources/')
+setwd('../NaturalResources/')
 
 pg_conf <- read.csv('../rds_settings', stringsAsFactors=FALSE)
 
@@ -33,7 +33,7 @@ nonfoods <- c("Building materials (e.g. wood that is not used as a fuel source) 
 resource$food[resource$resource %in% foods] <- resource$hh_hv2_10[resource$resource %in% foods]
 resource$nonfood[resource$resource %in% nonfoods] <- resource$hh_hv2_10[resource$resource %in% nonfoods]
 
-resource$declined <- resource$hh_hv2_15 == 'Declined'
+resource$in_decline <- resource$hh_hv2_15 == 'Declined'
 
 resource$multiplier[resource$hh_hv2_12 == "Annually"] <- 1
 resource$multiplier[resource$hh_hv2_12 == "Monthly"] <- 12
@@ -44,142 +44,67 @@ resource$nr_value <- resource$hh_hv2_14 * resource$multiplier
 
 resource <- resource %>%
   group_by(hh_refno, round) %>%
-  summarize(declined = mean(declined, na.rm=T),
+  summarize(in_decline = mean(in_decline, na.rm=T),
             nr_value = sum(nr_value, na.rm=T),
             food = any(food),
             nonfood = any(nonfood))
 
 resource[ c('food', 'nonfood')][is.na(resource[ c('food', 'nonfood')])] <- FALSE
-resource$declined[is.nan(resource$declined)] <- NA
+resource$in_decline[is.nan(resource$in_decline)] <- NA
 
 allvars <- left_join(allvars, resource)
-
-
-#bundles	cost	total_fuelwood_value	hh_annual_nonfuel_nr_value	Nonfuel_NR_decreasing
-
-
-# hv2_14_01 - Wild meat
-# hv2_14_02 - Wild insects
-# hv2_14_03 - Fish from local rivers/creeks
-# hv2_14_04 - Nuts or seeds
-# hv2_14_05 - Building materials (e.g. wood that is not used as a fuel source) 
-# hv2_14_06 - Medicinal Plants
-# hv2_14_07 - Items for special ceremonies
-# hv2_14_08 - Honey
-# hv2_14_09 - Other
-
-
-
-
-
-
-
-
-
-
 
 
 
 
 #Fuelwood Value
-hv1.1 <- tbl(con, 'c__household_secHV1') %>%
+fw_ind <- tbl(con, 'c__household_individual') %>%
   select(country, landscape_no, hh_refno, round, hh_hv104, hh_hv105) %>%
-  data.frame
+  collect
 
-hv1.1 <- merge(hv1.1, data.frame(hh_hv104=c('1', '2', '3', '4'), multiplier=c(52, 12, 4, 1)))
-hv1.1$bundles <- hv1.1$hh_hv105*hv1.1$multiplier
-hv1.1 <- hv1.1 %>% group_by(country, landscape_no, hh_refno, round) %>% summarize(bundles=sum(bundles, na.rm=T))
+fw_ind <- merge(fw_ind, data.frame(hh_hv104=c('Weekly', 'Monthly', 'Seasonally', 'Annually'), multiplier=c(52, 12, 4, 1)))
+fw_ind$bundles <- fw_ind$hh_hv105*fw_ind$multiplier
+fw_ind <- fw_ind %>% group_by(country, landscape_no, hh_refno, round) %>% summarize(bundles=sum(bundles, na.rm=T))
 
-hv1.2 <- tbl(con, 'c__household_secHV2') %>% 
-  select(country, landscape_no, hh_refno, round,
-         hh_hv105b_01) %>% data.frame %>%
+fw_value <- tbl(con, 'c__household') %>% 
+  select(country, landscape_no, hh_refno, round, hh_hv105b_01) %>% 
+  collect %>%
   group_by(country) %>%
   summarize(cost=median(hh_hv105b_01, na.rm=T)) %>% data.frame %>%
-  merge(hv1.1)
-hv1.2$total_fuelwood_value <- hv1.2$cost * hv1.2$bundles
-
-hv1 <- hv1.2 %>% group_by(country, landscape_no) %>% 
-  summarize(Mean_Annual_Fuelwood_Value=mean(total_fuelwood_value, na.rm=T))
+  merge(fw_ind)
+fw_value$total_fuelwood_value <- fw_value$cost * fw_value$bundles
 
 #Other HH-level fuelwood stats
-hv2.1 <- tbl(con, 'c__household_secHV2') %>% 
+fw_hh <- tbl(con, 'c__household') %>% 
   select(country, landscape_no, hh_refno, round, hh_hv109_01, hh_hv109b_01, hh_hv105c_01) %>% 
-  data.frame
+  collect
 
-hv2.1$fw_is_decreasing <- hv2.1$hh_hv109_01 == "1"
-hv2.1$not_enough_fw_past_year <- hv2.1$hh_hv109b_01 == "1"
-hv2.1$fw_from_wilderness <- hv2.1$hh_hv105c_01 %in% c('1', '1a', '1b', '2', '6')
+fw_hh$fw_is_decreasing <- fw_hh$hh_hv109_01 == "Decreased"
+fw_hh$fw_from_wilderness <- fw_hh$hh_hv105c_01 %in% c('Woodland', 'Forest', 'Shrubland', 'Grasland', 'From Private Or Community Woodlots')
 
-hv2.1 <- hv2.1 %>% select(fw_is_decreasing, not_enough_fw_past_year, fw_from_wilderness, country, landscape_no, hh_refno, round)
-
-hv2.1.1 <- hv2.1 %>% group_by(country, landscape_no) %>%
-  summarize(Fuelwood_Decreasing = mean(fw_is_decreasing, na.rm=T),
-            Fuelwood_Shortage_Past_Year = mean(not_enough_fw_past_year, na.rm=T),
-            Fuelwood_From_Natural_Areas = mean(fw_from_wilderness, na.rm=T)) %>%
-  data.frame
-
-#Natural Resource Value
+fw_hh <- fw_hh %>% select(fw_is_decreasing, not_enough_fw_past_year=hh_hv109b_01, fw_from_wilderness, country, landscape_no, hh_refno, round)
 
 
-#Nonfuel expenditures
-hv2.2.1 <- tbl(con, 'c__household_secHV2') %>% 
-  select(country, landscape_no, round, hh_refno, hv2_14_01, hv2_14_02, hv2_14_03, hv2_14_04,
-         hv2_14_05, hv2_14_06, hv2_14_07, hv2_14_08, hv2_14_09) %>% data.frame %>%
-  melt(id.vars=c("country", "landscape_no", "round", "hh_refno"), value.name = 'price')
-hv2.2.1$variable <- gsub('14', '', hv2.2.1$variable)
+#################
+#Combine and write
+##################
+nr <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(allvars, fw_value, fw_hh))
 
-hv2.2.2 <- tbl(con, 'c__household_secHV2') %>% 
-  select(country, landscape_no, round, hh_refno, hv2_12_01, hv2_12_02, hv2_12_03, hv2_12_04,
-         hv2_12_05, hv2_12_06, hv2_12_07, hv2_12_08, hv2_12_09) %>% data.frame %>%
-  melt(id.vars=c("country", "landscape_no", "round", "hh_refno"), value.name = 'freq')
-hv2.2.2$variable <- gsub('12', '', hv2.2.2$variable)
-
-hv2.2.3 <- tbl(con, 'c__household_secHV2') %>% 
-  select(country, landscape_no, round, hh_refno, hv2_15_01, hv2_15_02, hv2_15_03, hv2_15_04,
-         hv2_15_05, hv2_15_06, hv2_15_07, hv2_15_08, hv2_15_09) %>% data.frame %>%
-  melt(id.vars=c("country", "landscape_no", "round", "hh_refno"), value.name = 'avail')
-hv2.2.3$variable <- gsub('15', '', hv2.2.3$variable)
-
-hv2.2 <- merge(merge(hv2.2.1, hv2.2.2, all=T), hv2.2.3, all=T)
-hv2.2 <- merge(hv2.2, data.frame(freq=c("1", "2", "3", "4"), rate=c(52, 12, 4, 1)), all=T)
-
-hv2.2$annual_price <- hv2.2$price * hv2.2$rate
-hv2.2$nr_is_decreasing <- hv2.2$avail == "1"
-
-hv2.3 <- hv2.2 %>% group_by(country, landscape_no, hh_refno, round) %>%
-  summarize(hh_annual_nonfuel_nr_value = sum(annual_price, na.rm=T),
-            Nonfuel_NR_decreasing = mean(nr_is_decreasing, na.rm=T))
-
-hv2.4 <- hv2.3 %>% group_by(country, landscape_no) %>%
-  summarize(Nonfuel_NR_annual_value = mean(hh_annual_nonfuel_nr_value, na.rm=T),
-            Nonfuel_NR_decreasing = mean(Nonfuel_NR_decreasing, na.rm=T))
-
-#% of households that collect any natural resources
-hv2.5 <- tbl(con, 'c__household_secHV2') %>% 
-  select(country, landscape_no, hh_refno, round, hv2_10_01, hv2_10_02, hv2_10_03, hv2_10_04,
-         hv2_10_05, hv2_10_06, hv2_10_07, hv2_10_08, hv2_10_09) %>% data.frame %>%
-  melt(id.vars=c("country", "landscape_no", "hh_refno", 'round'), value.name = 'collects') %>%
-  group_by(country, landscape_no, hh_refno, round) %>% summarize(collects=any(collects=='1')) %>%
-  group_by(country, landscape_no) %>% summarize(Collects_Nonfuel_Resources=mean(collects, na.rm=T))
-
-
-hv <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1, hv2.1.1, hv2.4, hv2.5))
-
-hv <- merge(hv, data.frame(country = c('GHA', 'RWA', 'UGA', 'TZA'),
+hv <- merge(nr, data.frame(country = c('GHA', 'RWA', 'UGA', 'TZA'),
                                      Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
 
-rateadjust <- c("Mean_Annual_Fuelwood_Value", "Nonfuel_NR_annual_value")
+rateadjust <- c("total_fuelwood_value", "nr_value")
 hv[ , rateadjust] <- hv[ , rateadjust]/hv$Rate
 
-#HH Level Vars
-
-hv.hh <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(hv1.1, hv1.2, hv2.3, hh))
-
-hv.hh <- merge(hv.hh, data.frame(country = c('GHA', 'RWA', 'UGA', 'TZA'),
-                                     Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
-
-rateadjust <- c("total_fuelwood_value", "hh_annual_nonfuel_nr_value")
-hv.hh[ , rateadjust] <- hv.hh[ , rateadjust]/hv.hh$Rate
+hv_ls <- hv %>% group_by(country, landscape_no) %>%
+  summarize(Fuelwood_Decreasing = mean(fw_is_decreasing, na.rm=T),
+            Fuelwood_Shortage_Past_Year = mean(not_enough_fw_past_year, na.rm=T),
+            Fuelwood_From_Natural_Areas = mean(fw_from_wilderness, na.rm=T),
+            Mean_HH_Fuelwood_Value = mean(total_fuelwood_value, na.rm=T),
+            Percent_Collect_Food = mean(food, na.rm=T),
+            Percent_Collect_Nonfood = mean(nonfood, na.rm=T),
+            Percent_Resource_Decline = mean(in_decline, na.rm=T),
+            Mean_HH_NR_Value = mean(nr_value, na.rm=T))
 
 #########################################
 #Write
@@ -189,9 +114,6 @@ library(aws.s3)
 aws.signature::use_credentials()
 
 writeS3 <- function(df, name){
-  names(df) <- gsub('.', '_', names(df), fixed=T)
-  names(df)[names(df)=='Landscape__'] <- 'Landscape'
-  
   zz <- rawConnection(raw(0), "r+")
   write.csv(df, zz, row.names=F)
   aws.s3::put_object(file = rawConnectionValue(zz),
@@ -200,5 +122,5 @@ writeS3 <- function(df, name){
 }
 
 writeS3(hv, 'NaturalResources_Landscape.csv')
-writeS3(hv.hh, 'NaturalResources_HH.csv')
+writeS3(hv_ls, 'NaturalResources_HH.csv')
 
