@@ -121,6 +121,6 @@ writeS3 <- function(df, name){
   close(zz)
 }
 
-writeS3(hv, 'NaturalResources_Landscape.csv')
-writeS3(hv_ls, 'NaturalResources_HH.csv')
+writeS3(hv_ls, 'NaturalResources_Landscape.csv')
+writeS3(hv, 'NaturalResources_HH.csv')
 
