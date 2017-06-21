@@ -1,19 +1,10 @@
 #############################
-# Workflow - Nutrition
-# scale - Individual, Landscape
-#
-# input the following modules from the VS Server
-#   hh_sec_a, 
-#   hh_sec_b, 
-#   hh_sec_u
-
 # calculate the four nutrition indicators:
 #   % stunted
 #   % wasted
 #   % underweight
 #   % overweight
 #
-# output the 4 indicators at the given scale for the given time period
 #############################
 
 #################
@@ -32,22 +23,19 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 # Read datasets and only keep variables for nutrition thread
-hh_sec_a <- tbl(vs_db, build_sql("SELECT * FROM c__household")) %>%
-  select(country, Region, landscape_no, District, hh_refno, round, `Questionnaire inspection date`) %>%
-  data.frame
+hh <- tbl(vs_db, "c__household") %>%
+  select(country, landscape_no, hh_refno, round, hh_interview_date) %>%
+  collect
 
-hh_sec_b <- tbl(vs_db, build_sql('SELECT * FROM "c__household_secB"')) %>%
-  select(hh_refno, round, `Individual ID`, hh_b02, hh_b03) %>% # Sex, age
-  data.frame
-
-hh_sec_u <- tbl(vs_db, build_sql('SELECT * FROM "c__household_secU"')) %>%
-  filter(flag=='') %>% # weight=hh_v03; lenhei=hh_v04;  armc=hh_v07; measure=hh_v05 
-  select(hh_refno, round, `Individual ID`, u1_01, u2_01, u3_01, u4_01, u5_01, u6_01) %>%
-  data.frame
+hh_ind <- tbl(vs_db, "c__household_individual") %>%
+  filter(hh_u1) %>%
+  select(hh_refno, round, ind_refno, sex=hh_b02, dob=hh_b03, 
+         weight=hh_u2, lenhei=hh_u3, measure=hh_u4, armc=hh_u5) %>%
+  collect
 
 landscape <- tbl(vs_db, 'landscape') %>%
-  data.frame
-    
+  collect
+
 # Restore reference data sets
 weianthro <- read.table("WHO Anthro reference tables/weianthro.txt", header=T)
 lenanthro <- read.table("WHO Anthro reference tables/lenanthro.txt", header=T)
@@ -60,41 +48,25 @@ ssanthro <- read.table("WHO Anthro reference tables/ssanthro.txt", header=T)
 tsanthro <- read.table("WHO Anthro reference tables/tsanthro.txt", header=T)
 
 # Merge datasets into one "nutrition" dataset
-nutrition <- merge(hh_sec_a, hh_sec_b, 
-                   by = c("hh_refno", "round"), all = TRUE)
-nutrition <- merge(nutrition, hh_sec_u, 
-                   by = c("hh_refno", "Individual.ID", "round"), all = TRUE)
+nutrition <- merge(hh, hh_ind, by = c("hh_refno", "round"), all = TRUE)
 
-# Household and individual ID
-# N23. Gender (M=1, F=2)
-nutrition$sex <- as.integer(nutrition$hh_b02)
-nutrition$hh_b02 <- NULL
 
 # N24. Age
-nutrition$hh_b03 <- as.Date(substr(nutrition$hh_b03, 1, 10))
-# ISSUE32 change to Date of the interview when added
-nutrition$Data.collection.date <- as.Date(nutrition$Questionnaire.inspection.date)
+nutrition$dob <- as.Date(substr(nutrition$dob, 1, 10))
+nutrition$hh_interview_date <- as.Date(nutrition$hh_interview_date)
 
 # age in months
-# ISSUE32 change to Date of the interview when added
-nutrition$age <- (as.yearmon(nutrition$Data.collection.date) - 
-  as.yearmon(nutrition$hh_b03)) * 12
+nutrition$age <- (as.yearmon(nutrition$hh_interview_date) - 
+  as.yearmon(nutrition$dob)) * 12
 
 nutrition$intyr <- as.integer(format(nutrition$Data.collection.date, "%Y"))
 
-# N25. Height / N26. Weight / N27. Upper arm circumference
-
-names(nutrition)[names(nutrition) == "u2_01"] <- "weight"
-names(nutrition)[names(nutrition) == "u3_01"] <- "lenhei"
-names(nutrition)[names(nutrition) == "u5_01"] <- "armc"
-names(nutrition)[names(nutrition) == "u4_01"] <- "measure"
-
-nutrition$measure[nutrition$measure == "STANDING"] <- "1"
-nutrition$measure[nutrition$measure == "LYING DOWN"] <- "2"
+nutrition$measure[nutrition$measure == "Standing"] <- "1"
+nutrition$measure[nutrition$measure == "Lying Down"] <- "2"
 
 # ISSUE32 need to add date of interview when it is added
-vars <- c("country", "Region", "District", "landscape_no", "round",
-          "hh_refno", "Individual.ID",  "intyr", "age", 
+vars <- c("country", "landscape_no", "round",
+          "hh_refno", "ind_refno",  "intyr", "age", 
           "weight", "lenhei", "armc", "measure", "sex")
 
 nutrition <- nutrition[ , vars]
@@ -136,7 +108,7 @@ matz$zwei[matz$fwei==1] <- NA
 matz$zwfl[matz$fwfl==1] <- NA
 matz <- matz[matz$age > 6, ]
 
-nutrition_df <- matz[,c('country', 'landscape_no', 'hh_refno', 'Individual.ID', 'round', 'zlen', 'zwei', 'zwfl')] 
+nutrition_df <- matz[,c('country', 'landscape_no', 'hh_refno', 'ind_refno', 'round', 'zlen', 'zwei', 'zwfl')] 
 
 nutrition_df$stunting <- ifelse(nutrition_df$zlen < -2, 1, 0)
 nutrition_df$severe_stunting <- ifelse(nutrition_df$zlen < -3, 1, 0)
