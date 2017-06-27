@@ -59,8 +59,10 @@ food <- tbl(vs_db, "c__household_food") %>%
   collect
 
 food <- food %>% 
-  group_by(country, landscape_no, hh_refno, round) %>% 
-  summarise(Food.Consumption.Value = sum(hh_k_04 + hh_k_05a, na.rm = TRUE)*52.14, Food.Spending = sum(hh_k_04, na.rm=T)*52.14)
+  rowwise() %>%
+  mutate(FCV = sum(hh_k_04, hh_k_05a, na.rm=T)) %>%
+  group_by(country, landscape_no, hh_refno, round) %>%
+  summarise(Food.Consumption.Value = sum(FCV, na.rm = TRUE)*52.14, Food.Spending = sum(hh_k_04, na.rm=T)*52.14)
 
 #Combine and aggregate
 out <- Reduce(function(x, y){merge(x, y, all=T)}, list(fs, nfs, food))
