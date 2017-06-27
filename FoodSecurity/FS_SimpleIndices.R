@@ -28,7 +28,7 @@ fs <- tbl(vs_db, 'c__household') %>%
 
 fs$months_insecurity <- rowSums(fs[ , c(paste0('hh_i09a_', seq(1,12)), paste0('hh_i09b_', seq(1,12)))], na.rm=T)
 
-fs$hfias <- rowSums(fs[ , c('hh_i02_1', 'hh_i02_2', 'hh_i02_3', 'hh_i02_4', 'hh_i02_5', 'hh_i02_6', 'hh_i02_7', 'hh_i02_8')])
+fs$hfias <- rowSums(fs[ , c('hh_i02_1', 'hh_i02_2', 'hh_i02_3', 'hh_i02_4', 'hh_i02_5', 'hh_i02_6', 'hh_i02_7', 'hh_i02_8')], na.rm=T)
 
 
 f_groups <- c("hh_k2_8_a", "hh_k2_8_b", "hh_k2_8_c", "hh_k2_8_d", "hh_k2_8_e",
