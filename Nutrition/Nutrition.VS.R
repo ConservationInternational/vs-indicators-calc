@@ -28,7 +28,7 @@ hh <- tbl(vs_db, "c__household") %>%
   collect
 
 hh_ind <- tbl(vs_db, "c__household_individual") %>%
-  filter(hh_u1) %>%
+  filter(!is.na(hh_u2)) %>%
   select(hh_refno, round, ind_refno, sex=hh_b02, dob=hh_b03, 
          weight=hh_u2, lenhei=hh_u3, measure=hh_u4, armc=hh_u5) %>%
   collect
@@ -48,7 +48,7 @@ ssanthro <- read.table("WHO Anthro reference tables/ssanthro.txt", header=T)
 tsanthro <- read.table("WHO Anthro reference tables/tsanthro.txt", header=T)
 
 # Merge datasets into one "nutrition" dataset
-nutrition <- merge(hh, hh_ind, by = c("hh_refno", "round"), all = TRUE)
+nutrition <- merge(hh, hh_ind, by = c("hh_refno", "round"), all.x=F, all.y=T)
 
 
 # N24. Age
@@ -59,12 +59,11 @@ nutrition$hh_interview_date <- as.Date(nutrition$hh_interview_date)
 nutrition$age <- (as.yearmon(nutrition$hh_interview_date) - 
   as.yearmon(nutrition$dob)) * 12
 
-nutrition$intyr <- as.integer(format(nutrition$Data.collection.date, "%Y"))
+nutrition$intyr <- as.integer(format(nutrition$hh_interview_date, "%Y"))
 
 nutrition$measure[nutrition$measure == "Standing"] <- "1"
 nutrition$measure[nutrition$measure == "Lying Down"] <- "2"
 
-# ISSUE32 need to add date of interview when it is added
 vars <- c("country", "landscape_no", "round",
           "hh_refno", "ind_refno",  "intyr", "age", 
           "weight", "lenhei", "armc", "measure", "sex")
@@ -75,21 +74,6 @@ nutrition <- nutrition[ , vars]
 # Analysis
 #################
 
-nutrition_df <- data.frame(country = character(), 
-                           scale = character(), 
-                           year = integer(), 
-                           landscape = integer(),
-                           underweight = double(),
-                           underweight.severe = double(),
-                           stunting = double(),
-                           stunting.severe = double(),
-                           wasting = double(),
-                           wasting.severe = double(),
-                           overweight = double(),
-                           overweight.severe =  double())
-
-
-outfile_slice <- paste("igrowup_outfile")
 nutrition.subset <- nutrition[nutrition$age<60,]
 
 source('igrowup_standard.r')
