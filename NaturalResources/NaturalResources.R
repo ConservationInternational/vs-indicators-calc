@@ -14,7 +14,7 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 ######################################
 
 allvars <- tbl(con, 'c__household') %>%
-  select(country, landscape_no, hh_refno, round) %>% 
+  select(country, landscape_no, hh_refno, round, hh_interview_date) %>% 
   collect
 
 resource <- tbl(con, 'c__household_resource') %>%
@@ -90,13 +90,18 @@ fw_hh <- fw_hh %>% select(fw_is_decreasing, not_enough_fw_past_year=hh_hv109b_01
 ##################
 nr <- Reduce(f=function(x,y){merge(x,y,all=T)}, x=list(allvars, fw_value, fw_hh))
 
-hv <- merge(nr, data.frame(country = c('GHA', 'RWA', 'UGA', 'TZA'),
-                                     Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+exchange_rates <- read.csv('../exchange_rates_2009usd.csv')
+
+exchange_rates$date <- mdy(exchange_rates$date)
+
+#match rate to interview date and country
+nr$date <- ymd(ceiling_date(nr$hh_interview_date, "week"))  #find the next Sunday
+nr<-merge(nr, exchange_rates, all.x=T, all.y=F)
 
 rateadjust <- c("total_fuelwood_value", "nr_value")
-hv[ , rateadjust] <- hv[ , rateadjust]/hv$Rate
+nr[ , rateadjust] <- nr[ , rateadjust]/hv$rate
 
-hv_ls <- hv %>% group_by(country, landscape_no) %>%
+hv_ls <- nr %>% group_by(country, landscape_no) %>%
   summarize(Fuelwood_Decreasing = mean(fw_is_decreasing, na.rm=T),
             Fuelwood_Shortage_Past_Year = mean(not_enough_fw_past_year, na.rm=T),
             Fuelwood_From_Natural_Areas = mean(fw_from_wilderness, na.rm=T),
@@ -122,5 +127,5 @@ writeS3 <- function(df, name){
 }
 
 writeS3(hv_ls, 'NaturalResources_Landscape.csv')
-writeS3(hv, 'NaturalResources_HH.csv')
+writeS3(nr, 'NaturalResources_HH.csv')
 

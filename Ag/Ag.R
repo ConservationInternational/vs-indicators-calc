@@ -10,7 +10,7 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 allvars <- tbl(con, "c__household") %>%
-  select(country, landscape_no, hh_refno, round) %>%
+  select(country, landscape_no, hh_refno, round, ag_date_of_interview) %>%
   collect
 
 ########################
@@ -284,8 +284,13 @@ allvars <- merge(allvars, cropbyprod, all.x=T)
 #############################################################
 #Adjust Currencies and combine
 
-allvars <- merge(allvars, data.frame(country = c('GHA', 'RWA', 'UGA', 'TZA'),
-                                     rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+exchange_rates <- read.csv('../exchange_rates_2009usd.csv')
+
+exchange_rates$date <- mdy(exchange_rates$date)
+
+#match rate to interview date and country
+allvars$date <- ymd(ceiling_date(allvars$ag_date_of_interview, "week"))  #find the next Sunday
+allvars<-merge(allvars, exchange_rates, all.x=T, all.y=F)
 
 rateadjust <- c('cost_org_fert', 'cost_syn_fert', 'cost_irrigation', 'cost_herbpesticides', 
                 'cost_seeds_purchased', 'cost_hired_labor', 'value_fieldcrop_harvest', 'income_fieldcrop_sales',

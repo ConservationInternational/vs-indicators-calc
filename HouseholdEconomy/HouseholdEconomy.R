@@ -14,23 +14,23 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 ##############################################
 
 allvars <- tbl(con, "c__household") %>%
-  select(country, landscape_no, hh_refno, round) %>%
+  select(country, landscape_no, hh_refno, round, hh_interview_date) %>%
   collect
 
 ######################
 # Income from business and wages
 hhe <- tbl(con, "c__household_individual") %>%
-  select(hh_e65_1, hh_e65_2, hh_e64_1, hh_e64_2, 
+  select(net_income_business=hh_e65_1, hh_e65_2, gross_income_business=hh_e64_1, hh_e64_2, 
          hh_e22_1, hh_e22_2, hh_e24_1, hh_e24_2,
          hh_e08, hh_e51,
          hh_refno, round) %>%
   collect 
 
-hhe$net_income_business <- 0
+hhe$net_income_business[is.na(hhe$net_income_business)] <- 0
 hhe$net_income_business[which(hhe$hh_e65_2=='Week')] <- hhe$hh_e65_1[which(hhe$hh_e65_2=='Week')]*52.14286
 hhe$net_income_business[which(hhe$hh_e65_2=='Month')] <- hhe$hh_e65_1[which(hhe$hh_e65_2=='Month')]*12
 
-hhe$gross_income_business <- 0
+hhe$gross_income_business[is.na(hhe$gross_income_business)] <- 0
 hhe$gross_income_business[which(hhe$hh_e64_2=='Week')] <- hhe$hh_e64_1[which(hhe$hh_e64_2=='Week')]*52.14286
 hhe$gross_income_business[which(hhe$hh_e64_2=='Month')] <- hhe$hh_e64_1[which(hhe$hh_e64_2=='Month')]*12
 
@@ -134,8 +134,13 @@ allvars <- left_join(allvars, expense)
 
 #############################################################
 #Adjust Currencies and combine
-allvars <- merge(allvars, data.frame(country = c('GHA', 'RWA', 'UGA', 'TZA'),
-                             rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+exchange_rates <- read.csv('../exchange_rates_2009usd.csv')
+
+exchange_rates$date <- mdy(exchange_rates$date)
+
+#match rate to interview date and country
+allvars$date <- ymd(ceiling_date(allvars$hh_interview_date, "week"))  #find the next Sunday
+allvars<-merge(allvars, exchange_rates, all.x=T, all.y=F)
 
 rateadjust <- c('net_income_business', 'gross_income_business', 'income_wage',
                 'cost_annual_rent', 'cost_extension', 'cost_expenditures', 'cost_priceinfo',

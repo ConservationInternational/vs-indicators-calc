@@ -38,7 +38,8 @@ fs$diversity <- rowSums(fs[f_groups] / 7, na.rm=T) / length(f_groups)
 
 fs <- fs %>% 
   select(country, landscape_no, hh_refno, round, shortage_year=hh_i08, 
-         months_insecurity, number_meals=hh_i031, hfias, diversity)
+         months_insecurity, number_meals=hh_i031, hfias, diversity,
+         hh_interview_date)
 
 ##Nonfood spending
 ##Do we need Sec L?
@@ -68,12 +69,17 @@ food <- food %>%
 out <- Reduce(function(x, y){merge(x, y, all=T)}, list(fs, nfs, food))
 out$Food_As_Percent_Total_Spending <- (out$Food.Spending/(out$Food.Spending + out$Nonfood.Spending))*100
 
-out <- merge(out, data.frame(country = c('GHA', 'RWA', 'UGA', 'TZA'),
-                                     Rate    = c(4.348, 838.8, 3595, 2236)), all.x=T)
+exchange_rates <- read.csv('../exchange_rates_2009usd.csv')
+
+exchange_rates$date <- mdy(exchange_rates$date)
+
+#match rate to interview date and country
+out$date <- ymd(ceiling_date(out$hh_interview_date, "week"))  #find the next Sunday
+out<-merge(out, exchange_rates, all.x=T, all.y=F)
 
 rateadjust <- c('Nonfood.Spending', 'Food.Spending', 'Food.Consumption.Value')
 
-out[ , rateadjust] <- out[ , rateadjust]/out$Rate
+out[ , rateadjust] <- out[ , rateadjust]/out$rate
 
 out_ls <- out %>% group_by(country, landscape_no) %>%
   summarize(avg_meals = mean(number_meals, na.rm=T),
