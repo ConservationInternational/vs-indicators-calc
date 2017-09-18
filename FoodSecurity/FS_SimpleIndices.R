@@ -1,4 +1,5 @@
 library(dplyr)
+library(lubridate)
 
 setwd('../FoodSecurity/')
 
@@ -79,7 +80,7 @@ out<-merge(out, exchange_rates, all.x=T, all.y=F)
 
 rateadjust <- c('Nonfood.Spending', 'Food.Spending', 'Food.Consumption.Value')
 
-out[ , rateadjust] <- out[ , rateadjust]/out$rate
+out[ , rateadjust] <- (out[ , rateadjust]/out$rate)*1.1
 
 out_ls <- out %>% group_by(country, landscape_no) %>%
   summarize(avg_meals = mean(number_meals, na.rm=T),

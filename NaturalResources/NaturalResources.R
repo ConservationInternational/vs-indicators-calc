@@ -1,5 +1,6 @@
 library(dplyr)
 library(reshape2)
+library(lubridate)
 
 setwd('../NaturalResources/')
 
@@ -99,7 +100,7 @@ nr$date <- ymd(ceiling_date(nr$hh_interview_date, "week"))  #find the next Sunda
 nr<-merge(nr, exchange_rates, all.x=T, all.y=F)
 
 rateadjust <- c("total_fuelwood_value", "nr_value")
-nr[ , rateadjust] <- nr[ , rateadjust]/hv$rate
+nr[ , rateadjust] <- (nr[ , rateadjust]/hv$rate)*1.1
 
 hv_ls <- nr %>% group_by(country, landscape_no) %>%
   summarize(Fuelwood_Decreasing = mean(fw_is_decreasing, na.rm=T),

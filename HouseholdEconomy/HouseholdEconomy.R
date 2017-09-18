@@ -1,5 +1,6 @@
 library(dplyr)
 library(ineq)
+library(lubridate)
 
 setwd('../HouseholdEconomy/')
 
@@ -146,7 +147,7 @@ rateadjust <- c('net_income_business', 'gross_income_business', 'income_wage',
                 'cost_annual_rent', 'cost_extension', 'cost_expenditures', 'cost_priceinfo',
                 'cost_water', 'income_field_rent')
 
-allvars[ , rateadjust] <- allvars[ , rateadjust]/allvars$rate
+allvars[ , rateadjust] <- (allvars[ , rateadjust]/allvars$rate)*1.1
 
 allvars <- mutate(allvars, total_nonag_income = gross_income_business + income_wage)
 allvars <- mutate(allvars, total_nonag_costs = cost_annual_rent +cost_extension + 

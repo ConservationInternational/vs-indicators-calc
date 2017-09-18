@@ -1,5 +1,6 @@
 library(dplyr)
 library(ineq)
+library(lubridate)
 
 setwd('../Ag')
 
@@ -46,18 +47,24 @@ inputs <- tbl(con, "c__household_field_season") %>%
          fert_mrp=ag3a_45_mrp,
          ag3a_43, ag3a_49, ag3a_56,
          ag31_13, ag3a_61,
-         ag3a_72_1d, ag3a_72_2d, ag3a_72_3d, ag3a_72_4d) %>%
+         ag3a_72_4a, ag3a_72_4b, ag3a_72_4c, ag3a_72_4d) %>%
   collect
 
-inputs$hired_labor <- rowSums(inputs[ , c('ag3a_72_1d', 'ag3a_72_2d', 'ag3a_72_3d', 'ag3a_72_4d')], na.rm=T)
+inputs$hired_labor <- rowSums(inputs[ , c('ag3a_72_4a', 'ag3a_72_4b', 'ag3a_72_4c', 'ag3a_72_4d')], na.rm=T)
 
-inputs$ag3a_59[!inputs$ag3a_58] <- FALSE
+inputs$ag3a_59[which(!inputs$ag3a_58)] <- FALSE
 
-inputs$pesticide <- inputs$ag3a_59==1
-inputs$herbicide <- inputs$ag3a_59==2
-inputs$fungicide <- inputs$ag3a_59==3
+inputs$pesticide <- inputs$ag3a_59=="Pesticide"
+inputs$herbicide <- inputs$ag3a_59=="Herbicide"
+inputs$fungicide <- inputs$ag3a_59=="Fungicide"
 
 inputs$fert_total_paid <- rowSums(data.frame(inputs$ag3a_49, inputs$ag3a_56), na.rm=T)
+
+ferts <- c('fert_residue', 'fert_manure','fert_naturalfallow', 'fert_legumefallow',
+        'fert_covercrop', 'fert_biomass','fert_compost','fert_dap','fert_urea',
+        'fert_tsp','fert_can','fert_sa','fert_npk','fert_mrp')
+
+inputs[ , ferts][is.na(inputs[ , ferts])] <- FALSE
 
 inputs <- inputs %>% group_by(hh_refno, round) %>%
   summarize(pct_fields_irrigated = mean(ag3a_17, na.rm=T),
@@ -92,7 +99,13 @@ allvars <- left_join(allvars, inputs)
 #####################################
 # Field - Season - Crop level
 crops <- tbl(con, "c__household_field_season_fieldcrop") %>%
-  collect %>%
+  select(hh_refno, round, ag4a_04, ag4a_19, ag4a_21, ag4a_16) %>%
+  collect
+
+crops[ , c('ag4a_04', 'ag4a_19')][is.na(crops[ , c('ag4a_04', 'ag4a_19')])] <- FALSE
+crops[ , c('ag4a_21', 'ag4a_16')][is.na(crops[ , c('ag4a_21', 'ag4a_16')])] <- 0
+
+crops <- crops %>%
   group_by(hh_refno, round) %>%
   summarize(intercrop_rate = mean(ag4a_04, na.rm=T),
             pct_buy_seed=mean(ag4a_19, na.rm=T),
@@ -160,6 +173,12 @@ sold <- tbl(con, "c__household_fieldcrop") %>%
          ag5a_20, ag5a_22, ag5a_03, ag5a_26) %>%
   collect
 
+sold[ , c('ag5a_01', 'ag5a_20')][is.na(sold[ , c('ag5a_01', 'ag5a_20')])] <- FALSE
+
+sel <- c('ag5a_22', 'ag5a_03', 'ag5a_26')
+
+sold[ , sel][is.na(sold[ ,sel])] <- 0
+
 sold <- sold %>% group_by(hh_refno, round) %>%
   summarize(pct_crops_any_sold = mean(ag5a_01, na.rm=T),
             pct_crops_losses = mean(ag5a_20, na.rm=T),
@@ -185,8 +204,6 @@ perm_hh <- tbl(con, 'c__household_permcrop') %>%
 
 perm <- full_join(perm, perm_hh)
 
-perm$value_permcrops <- perm$value_permcrops - perm$income_permcrops
-
 allvars <- left_join(allvars, perm)
 
 ###################################
@@ -194,7 +211,7 @@ allvars <- left_join(allvars, perm)
 livestock_byprod <- tbl(con, 'c__household_livestockbyprod') %>%
   collect %>%
   group_by(hh_refno, round) %>% 
-  summarize(value_livestockbyprod_consumed = sum(ag10b_1b, na.rm=T) - sum(ag10b_06, na.rm=T),
+  summarize(value_livestockbyprod_produced = sum(ag10b_1b, na.rm=T),
             income_livestockbyprod_sales = sum(ag10b_06, na.rm=T))
 
 allvars <- left_join(allvars, livestock_byprod)
@@ -231,7 +248,7 @@ livestock$home.value <- livestock$Home.Use*livestock$lvalue
 
 livestock <- livestock %>% 
   group_by(hh_refno, round) %>% 
-  summarize(value_consumed_livestock=sum(home.value, na.rm=T),
+  summarize(value_produced_livestock=sum(home.value, na.rm=T) + sum(Total.Value, na.rm=T),
             income_livestock_sales=sum(Total.Value, na.rm=T),
             cost_livestock_labor=sum(ag10a_34, na.rm=T))
 
@@ -253,6 +270,10 @@ cropbyprod <- tbl(con, 'c__household_cropbyprod') %>%
   select(country, landscape_no, hh_refno, round, ag09_11, ag09_04_1, ag09_05, ag09_06_1, ag09_08, crop_name) %>%
   collect
 
+sel <- c('ag09_11', 'ag09_04_1', 'ag09_06_1', 'ag09_08')
+cropbyprod[ , sel][is.na(cropbyprod[ , sel])] <- 0
+cropbyprod[ , 'ag09_05'][is.na(cropbyprod[ , 'ag09_05'])] <- FALSE
+
 cropbyprod$Not.Sold <- mapply(cropbyprod$ag09_04_1, -cropbyprod$ag09_06_1, FUN=sum, na.rm=T)
 cropbyprod$PerUnitValue <- cropbyprod$ag09_08/cropbyprod$ag09_06_1
 
@@ -273,7 +294,7 @@ cropbyprod$value <- cropbyprod$Not.Sold*cropbyprod$lvalue
 
 cropbyprod <- cropbyprod %>% 
   group_by(hh_refno, round) %>% 
-  summarize(value_consumed_cropbyprods=sum(value),
+  summarize(value_produced_cropbyprods=sum(value) + sum(ag09_08),
             income_cropbyprods_sold=sum(ag09_08),
             cropbyprod_pct_sold=mean(ag09_05),
             cost_cropbyprod_expenses=sum(ag09_11, na.rm=T))
@@ -294,11 +315,11 @@ allvars<-merge(allvars, exchange_rates, all.x=T, all.y=F)
 
 rateadjust <- c('cost_org_fert', 'cost_syn_fert', 'cost_irrigation', 'cost_herbpesticides', 
                 'cost_seeds_purchased', 'cost_hired_labor', 'value_fieldcrop_harvest', 'income_fieldcrop_sales',
-                'income_residue_sales', 'value_permcrops', 'income_permcrops', 'value_consumed_livestock', 'income_livestock_sales',
-                'cost_livestock_labor', 'value_consumed_cropbyprods', 'income_cropbyprods_sold', 
-                'cost_cropbyprod_expenses', 'value_livestockbyprod_consumed', 'income_livestockbyprod_sales')
+                'income_residue_sales', 'value_permcrops', 'income_permcrops', 'value_produced_livestock', 'income_livestock_sales',
+                'cost_livestock_labor', 'value_produced_cropbyprods', 'income_cropbyprods_sold', 
+                'cost_cropbyprod_expenses', 'value_livestockbyprod_produced', 'income_livestockbyprod_sales')
 
-allvars[ , rateadjust] <- allvars[ , rateadjust]/allvars$rate
+allvars[ , rateadjust] <- (allvars[ , rateadjust]/allvars$rate)*1.1
 
 allvars$total_ag_sales_income <- rowSums(allvars[ , grepl('income', names(allvars))], na.rm=T)
 allvars$total_ag_production_value <- rowSums(allvars[ , c(grepl('value', names(allvars)))], na.rm=T) + allvars$total_ag_sales_income
@@ -354,11 +375,11 @@ allvars_landscape <- allvars %>%
             income_residue_sales=mean(income_residue_sales, na.rm=T),
             value_permcrops=mean(value_permcrops, na.rm=T),
             income_permcrops=mean(income_permcrops, na.rm=T),
-            value_livestockbyprod_consumed=mean(value_livestockbyprod_consumed, na.rm=T),
-            value_consumed_livestock=mean(value_consumed_livestock, na.rm=T),
+            value_livestockbyprod_produced=mean(value_livestockbyprod_produced, na.rm=T),
+            value_produced_livestock=mean(value_produced_livestock, na.rm=T),
             income_livestock_sales=mean(income_livestock_sales, na.rm=T),
             cost_livestock_labor=mean(cost_livestock_labor, na.rm=T),
-            value_consumed_cropbyprods=mean(value_consumed_cropbyprods, na.rm=T),
+            value_produced_cropbyprods=mean(value_produced_cropbyprods, na.rm=T),
             income_cropbyprods_sold=mean(income_cropbyprods_sold, na.rm=T),
             cropbyprod_pct_sold=mean(cropbyprod_pct_sold, na.rm=T),
             cost_cropbyprod_expenses=mean(cost_cropbyprod_expenses, na.rm=T),
